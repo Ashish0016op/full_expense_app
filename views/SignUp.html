@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+</head>
+<style>
+    body {
+        background-color: whitesmoke;
+    }
+    .signUp-form {
+        margin-top: 87px;
+        margin-left: 19%;
+        margin-right: 51%;
+    }
+    .show_image {
+        background-image: url(/public/img/tamanna-rumee-7OCUyev2M9E-unsplash.jpg);
+        background-size: cover;
+        text-align: center;
+        margin-right: 18px;
+        height: 243px;
+        width: 260px;
+        border-radius: 17px 0px 0px 17px;
+    }
+    .container{
+        display: flex;
+        background-color: beige;
+        border-radius: 17px;
+    }
+    .flex {
+        margin-top: 57px;
+    }
+</style>
+<body>
+    <form class="signUp-form" action="/sign_up" method="POST">
+        <div class="container">
+            <div class="show_image">
+                <h2>Expense Tracker</h2>
+            </div>
+            <div class="flex">
+                <div class="form-group">
+                    <label for="InputName">Username</label>
+                    <input type="text" class="form-control" id="InputName" placeholder="Enter Name">
+                </div>
+                <div class="form-group">
+                <label for="exampleInputEmail1">Email address</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                </div>
+                <div class="form-group">
+                <label for="exampleInputPassword1">Password</label>
+                <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                </div>
+                <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+
+      </form>
+    
+</body>
+</html>
