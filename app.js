@@ -4,11 +4,11 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const sequelize = require('./util/database');
+const signRoutes = require('./routes/signUp');
+const loginRoutes=require('./routes/login');
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-const signRoutes = require('./routes/signUp');
-const loginRoutes=require('./routes/login');
 app.use(signRoutes);
 app.use(loginRoutes);
 app.use('/login',(req, res, next) => {
