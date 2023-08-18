@@ -57,6 +57,7 @@
                 <label class="form-check-label" for="exampleCheck1">Check me out</label>
                 </div>
                 <button type="submit" id="buttn" class="btn btn-primary">login</button>
+                <p id="errorMess" style="color: red;"></p>
                 <div class="loginPage">
                     <h5>Don't have an account <a href="/SignUp">Sign up</a></h5>
                 </div>
@@ -81,6 +82,9 @@
                         break;
                     }
                 }if(!flag){
+                    const errorMess=document.getElementById('errorMess');
+                    errorMess.innerHTML='user not found';
+                    errorMess.style.display='block';
                     window.alert('wrong credentials');
                 }
             }catch (error){
