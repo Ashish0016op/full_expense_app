@@ -6,14 +6,19 @@ const cors = require('cors');
 const sequelize = require('./util/database');
 const signRoutes = require('./routes/signUp');
 const loginRoutes=require('./routes/login');
+const expenseRoutes=require('./routes/expense');
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(signRoutes);
 app.use(loginRoutes);
+app.use(expenseRoutes);
 app.use('/login',(req, res, next) => {
     res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
+app.use('/expense',(req,res,next)=>{
+    res.sendFile(path.join(__dirname,'views','expense.html'));
+})
 app.use((req, res, next) => {
     res.sendFile(path.join(__dirname, 'views', 'SignUp.html'));
 });

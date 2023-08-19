@@ -30,19 +30,3 @@ exports.getDetails = async (req, res, next) => {
     }
 };
 
-// bcrypt.compare(providedPassword, user.password, (err, result) => {
-        //     if (err) {
-        //         console.error('Error comparing passwords:', err);
-        //         res.status(500).json({ error: 'An error occurred while comparing passwords.' });
-        //         return;
-        //     }
-
-        //     if (result) {
-        //         // Passwords match
-        //         res.status(200).json({ message: 'Password is correct.' });
-        //     } else {
-        //         // Passwords do not match
-        //         res.status(401).json({ error: 'Incorrect password.' });
-        //     }
-            
-        // });
