@@ -76,12 +76,13 @@
 
                 const response = await axios.post('http://localhost:5500/login', {
                     email: email,
-                    password: password
+                    password: password,
+                    
                 });
-
                 if (response.status === 200 && response.data.message === 'Login successful') {
                     window.alert('Login successful');
                     window.location.href="/expense";
+                    localStorage.setItem('token', response.data.token);
                 }
             } catch (error) {
                 if (error.response && error.response.status === 401) {

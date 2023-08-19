@@ -84,19 +84,24 @@
                     email:email,
                     password:password
                 }
-                const existingUser= await axios.get('http://localhost:5500/user_login');
-                for(let i=0;i<existingUser.data.userDetails.length;i++){
-                    if(existingUser.data.userDetails[i].email===email){
-                        const errorMessage=document.getElementById('errorLogin');
-                        errorMessage.innerHTML='user already exist';
-                        errorMessage.style.display='block';
+                const userExistsResponse = await axios.get('http://localhost:5500/user_login', {
+                    params: {
+                        email: email // Send the email as a query parameter
                     }
+                });
+
+                if (userExistsResponse.data.exists) {
+                    const errorMessage = document.getElementById('errorLogin');
+                    errorMessage.innerHTML = 'User already exists';
+                    errorMessage.style.display = 'block';
+                } else {
+                    // Proceed with user registration
+                    const response = await axios.post('http://localhost:5500/signUp', data);
+                    window.location.href = 'http://localhost:5500/login';
                 }
-                const response=await axios.post('http://localhost:5500/signUp',data);
-                
-                window.location.href = 'http://localhost:5500/login';
             }catch (error){
                 console.log(error);
+                console.log('error');
             }
         }
       </script>

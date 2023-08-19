@@ -1,7 +1,12 @@
 
 const loginDetails=require('../model/loginDetails');
 const bcrypt=require('bcrypt');
-
+const jwt=require('jsonwebtoken');
+const crypto = require('crypto');
+const config = require('../configuration/config');
+function generateAccessToken(id){
+    return jwt.sign({id},config.secretKey);
+}
 exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
@@ -13,7 +18,9 @@ exports.login = async (req, res, next) => {
         if (!isPasswordValid) {
             return res.status(401).json({ error: 'Invalid credentials2' });
         }
-        res.status(200).json({ message: 'Login successful' });
+        const token=generateAccessToken(user.id);
+        res.status(200).json({ message: 'Login successful', token });
+
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).json({ error: 'An error occurred during login.' });

@@ -1,13 +1,19 @@
 const expenseDetails=require('../model/expenseData');
+const config=require('../configuration/config');
+const jwt=require('jsonwebtoken');
 exports.postDetails=async (req,res,next)=>{
     try{
         const expenseAmt=req.body.expense_amount;
         const des=req.body.description;
         const cat=req.body.category;
+        const token = req.header('Authorization').replace('Bearer ', '');
+        const decodedToken = jwt.verify(token, config.secretKey);
+        const userId = decodedToken.id;
         const response=await expenseDetails.create({
             expense_amount:expenseAmt,
             description:des,
-            category:cat
+            category:cat,
+            signupDatumId:userId
         })
         res.status(200).json({expenseData:{response}});
     }catch(error){
@@ -16,7 +22,10 @@ exports.postDetails=async (req,res,next)=>{
 }
 exports.getDetails= async (req,res,next)=>{
     try{
-        const getExpense=await expenseDetails.findAll();
+        const token = req.header('Authorization').replace('Bearer ', '');
+        const decodedToken = jwt.verify(token, config.secretKey);
+        const userId = decodedToken.id;
+        const getExpense=await expenseDetails.findAll({where:{signupDatumId: userId}});
         res.status(200).json({getExpense});
     }catch(error){
         console.log(error);

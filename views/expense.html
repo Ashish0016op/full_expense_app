@@ -67,10 +67,15 @@
                 const data={
                     "expense_amount":expenseAmount,
                     "description":Description,
-                    "category":category
+                    "category":category,
                 }
             try{
-                const response=await axios.post('http://localhost:5500/expense',data);
+                const token=localStorage.getItem('token');
+                const response = await axios.post('http://localhost:5500/expense', data, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const addExpensesDetails=document.getElementById('addExpensesDetails');
                 const list=document.createElement('li');
                 const btn=document.createElement('button');
@@ -91,21 +96,36 @@
         async function fetchData(e){
             e.preventDefault();
             try{
-                const response=await axios.get('http://localhost:5500/get_expense');
-                console.log(response.data.getExpense);
-                for(let i=0;i<response.data.getExpense.length;i++){
-                    const addExpensesDetails=document.getElementById('addExpensesDetails');
-                    const list=document.createElement('li');
-                    const btn=document.createElement('button');
-                    btn.textContent='Delete expense';
-                    btn.addEventListener('click',async()=>{
+                const token=localStorage.getItem('token');
+                const response = await axios.get('http://localhost:5500/get_expense', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const getExpense = response.data.getExpense;
+
+                const addExpensesDetails = document.getElementById('addExpensesDetails');
+                addExpensesDetails.innerHTML = '';
+
+                getExpense.forEach(expense => {
+                    const list = document.createElement('li');
+                    const btn = document.createElement('button');
+                    btn.textContent = 'Delete expense';
+
+                    btn.addEventListener('click', async () => {
                         list.remove();
-                        deleteData(response.data.getExpense[i].id);
-                    })
-                    list.innerHTML=response.data.getExpense[i].expense_amount+" - "+response.data.getExpense[i].description+" - "+response.data.getExpense[i].category+" - ";
+                        await deleteData(expense.id);
+                    });
+
+                    list.innerHTML = `
+                        ${expense.expense_amount} - 
+                        ${expense.description} - 
+                        ${expense.category} - `;
+
                     list.appendChild(btn);
                     addExpensesDetails.appendChild(list);
-                }
+                });
+
             }catch(error){
                 console.log(error);
             }
