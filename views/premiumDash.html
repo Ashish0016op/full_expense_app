@@ -34,7 +34,6 @@
     }
 </style>
 <body>
-    <button type="submit" id="premiumButton">Buy Premium</button>
     <div class="formContainer">
         <form action="/expense" method="POST">
             <h2>Expense app</h2>
@@ -52,6 +51,10 @@
             <div id="premiumButtn">
                 <button type="submit" id="buttn">Add Expenses</button>
             </div>
+            <div class="premiumUser">
+                <h3>you are a premium user</h3>
+                <button type="submit" id="showLeaderBoard">ShowLeaderBoard</button>
+            </div>
             
         </form>
     </div>
@@ -59,44 +62,45 @@
         <h2 id="form2">Expenses Details</h2>
         <ul id="addExpensesDetails"></ul>
     </div>
+    <div id="leaderboard"></div>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
     <script>
-        const premiumButton=document.getElementById('premiumButton');
-        premiumButton.addEventListener('click',getPremium);
-        async function getPremium(e){
-            e.preventDefault();
-            const token=localStorage.getItem('token');
-            const response=await axios.get('http://localhost:5500/pending_prem',{
-                headers: {
-                        'Authorization': `Bearer ${token}`
-                }
-            })
-            console.log(response.data);
-            var options={
-                "key":response.data.key_id,
-                "order_id":response.data.order.id,
-                "handler":async function (paymentResponse){
-                    await axios.post('http://localhost:5500/success_trans',{
-                        order_id:options.order_id,
-                        payment_id:paymentResponse.razorpay_payment_id,
-                    },{
+        const ShowLeaderBoard=document.getElementById('showLeaderBoard');
+        const leaderboardContainer=document.getElementById('leaderboard');
+        ShowLeaderBoard.addEventListener('click',getAllData);
+        async function getAllData(e) {
+                e.preventDefault();
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch('http://localhost:5500/AllData', {
                         headers: {
-                        'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}`
                         }
-                    })
-                    alert('you are a premium user now');
-                    window.location.href='/premiumDash';
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error fetching data: ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    console.log(data);
+                    leaderboardContainer.innerHTML = '';
+
+                    data.forEach((user, index) => {
+                        const userDiv = document.createElement('div');
+                        userDiv.className = 'user-entry';
+                        userDiv.innerHTML = `
+                            <span class="user-name">Name - ${user.userName}  </span>
+                            <span class="total-expenses">Total Expenses - ${user.totalExpenses}</span>
+                        `;
+                        leaderboardContainer.appendChild(userDiv);
+                    });
+                } catch (error) {
+                    console.error(error);
                 }
-            }
-            const rzp1= new Razorpay(options);
-            rzp1.open();
-            e.preventDefault();
-            rzp1.on('payment.failed',function(response){
-                console.log('response');
-                alert('something went wrong');
-            })
         }
+
         const buttn=document.getElementById('buttn');
         buttn.addEventListener('click',postData);
         async function postData(e){
@@ -142,11 +146,8 @@
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                const isPrem=localStorage.getItem('isPremium');
-                if(isPrem==='true'){
-                    window.location.href='/premiumDash';
-                }
                 const getExpense = response.data.getExpense;
+
                 const addExpensesDetails = document.getElementById('addExpensesDetails');
                 addExpensesDetails.innerHTML = '';
 

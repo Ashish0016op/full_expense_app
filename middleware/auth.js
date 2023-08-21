@@ -14,7 +14,7 @@ exports.authenticate = async (req, res, next) => {
         const tokenValue = token.replace('Bearer ', '');
 
         const user = jwt.verify(tokenValue, config.secretKey);
-        console.log(user.email);
+        req.user = user;
     } catch (error) {
         console.log(error);
         return res.status(401).json({ error: 'Invalid token' });

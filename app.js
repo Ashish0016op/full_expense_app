@@ -12,6 +12,7 @@ const PremiumRoutes=require('./routes/premium');
 const ExpenseData=require('./model/expenseData');
 const Login=require('./model/loginDetails');
 const premium=require('./model/order');
+const getAllDataRouter=require('./routes/getUserData');
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -19,11 +20,15 @@ app.use(signRoutes);
 app.use(loginRoutes);
 app.use(PremiumRoutes);
 app.use(expenseRoutes);
+app.use(getAllDataRouter);
 app.use('/login',(req, res, next) => {
     res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 app.use('/expense',(req,res,next)=>{
     res.sendFile(path.join(__dirname,'views','expense.html'));
+})
+app.use('/premiumDash',(req,res,next)=>{
+    res.sendFile(path.join(__dirname,'views','premiumDash.html'));
 })
 app.use((req, res, next) => {
     res.sendFile(path.join(__dirname, 'views', 'SignUp.html'));

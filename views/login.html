@@ -77,9 +77,15 @@
                     
                 });
                 if (response.status === 200 && response.data.message === 'Login successful') {
-                    window.alert('Login successful');
-                    window.location.href="/expense";
+                    if (response.data.isPremium1) {
+                        window.alert('Login successful as Premium user');
+                        window.location.href = "/premiumDash";
+                    } else {
+                        window.alert('Login successful');
+                        window.location.href = "/expense";
+                    }
                     localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('isPremium',response.data.isPremium1);
                 }
             } catch (error) {
                 if (error.response && error.response.status === 401) {

@@ -1,7 +1,7 @@
 require('dotenv').config();
 const rzp = require('razorpay');
-const orderModel = require('../model/order'); // Renamed "order" model to "orderModel"
-
+const orderModel = require('../model/order');
+const loginModel=require('../model/loginDetails');
 exports.purchasePremium = async (req, res, next) => {
     try {
         var instance = new rzp({
@@ -45,7 +45,10 @@ exports.updateTransaction = async (req, res, next) => {
         }
 
         await foundOrder.update({ paymentid: payment_id, status: 'success' });
-
+        await loginModel.update(
+            { isPremium: true },
+            { where: { id: req.user.id } } // Update the specific user
+        );
         return res.status(202).json({ success: true, message: 'Transaction successful' });
     } catch (error) {
         console.error(error);
