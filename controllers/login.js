@@ -4,8 +4,8 @@ const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
 const crypto = require('crypto');
 const config = require('../configuration/config');
-function generateAccessToken(id){
-    return jwt.sign({id},config.secretKey);
+function generateAccessToken(id,isPremium1){
+    return jwt.sign({id,isPremium1},config.secretKey);
 }
 exports.login = async (req, res, next) => {
     try {
@@ -18,8 +18,10 @@ exports.login = async (req, res, next) => {
         if (!isPasswordValid) {
             return res.status(401).json({ error: 'Invalid credentials2' });
         }
-        const token=generateAccessToken(user.id);
-        res.status(200).json({ message: 'Login successful', token });
+        const isPremium1 = !!user.isPremium;
+        const token=generateAccessToken(user.id,isPremium1);
+        res.status(200).json({ message: 'Login successful', token, isPremium1 });
+        
 
     } catch (error) {
         console.error('Error during login:', error);
