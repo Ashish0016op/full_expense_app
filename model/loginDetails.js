@@ -19,5 +19,6 @@ const signCred=sequelize.define('signupData',{
         type:Sequelize.STRING,
         allowNull:false
     },
+    isPremium:Sequelize.BOOLEAN
 })
 module.exports=signCred;
