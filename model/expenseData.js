@@ -19,6 +19,7 @@ const expenseDetails=sequelize.define('expense_details',{
         type:Sequelize.STRING,
         allowNull:false
     },
+    
 })
 
 module.exports=expenseDetails;

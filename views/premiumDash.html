@@ -84,7 +84,6 @@
                     }
 
                     const data = await response.json();
-                    console.log(data);
                     leaderboardContainer.innerHTML = '';
 
                     data.forEach((user, index) => {
@@ -92,7 +91,7 @@
                         userDiv.className = 'user-entry';
                         userDiv.innerHTML = `
                             <span class="user-name">Name - ${user.Username}  </span>
-                            <span class="total-expenses">Total Expenses - ${user.totalExpenses}</span>
+                            <span class="total-expenses">Total Expenses - ${user.TotalExpense.totalExpense}</span>
                         `;
                         leaderboardContainer.appendChild(userDiv);
                     });

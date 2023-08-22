@@ -1,4 +1,5 @@
 const expenseDetails=require('../model/expenseData');
+const expsAmt=require('../model/totalExpenses');
 const config=require('../configuration/config');
 const jwt=require('jsonwebtoken');
 exports.postDetails=async (req,res,next)=>{
@@ -13,8 +14,21 @@ exports.postDetails=async (req,res,next)=>{
             expense_amount:expenseAmt,
             description:des,
             category:cat,
-            signupDatumId:userId
+            signupDatumId:userId,
+            
         })
+        const totalExpRecord = await expsAmt.findOne();
+        const totalExp = totalExpRecord ? totalExpRecord.totalExpense + parseInt(expenseAmt) : parseInt(expenseAmt);
+
+        // Update or create the total expenses record
+        if (totalExpRecord) {
+            await totalExpRecord.update({ totalExpense: totalExp });
+        } else {
+            await expsAmt.create({
+                 totalExpense: totalExp,
+                 signupDatumId:userId,
+            });
+        }
         res.status(200).json({expenseData:{response}});
     }catch(error){
         console.log(error);

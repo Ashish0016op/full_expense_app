@@ -11,6 +11,7 @@ const expenseRoutes=require('./routes/expense');
 const PremiumRoutes=require('./routes/premium');
 const ExpenseData=require('./model/expenseData');
 const Login=require('./model/loginDetails');
+const totalExps=require('./model/totalExpenses');
 const premium=require('./model/order');
 const getAllDataRouter=require('./routes/getUserData');
 app.use(cors());
@@ -40,6 +41,8 @@ ExpenseData.belongsTo(Login);
 Login.hasMany(premium);
 premium.belongsTo(Login);
 
+Login.hasOne(totalExps);
+totalExps.belongsTo(Login);
 
 sequelize.sync({force:true})
 .then(() => {
