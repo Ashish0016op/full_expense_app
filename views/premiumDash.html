@@ -84,6 +84,7 @@
                     }
 
                     const data = await response.json();
+                    console.log(data);
                     leaderboardContainer.innerHTML = '';
 
                     data.forEach((user, index) => {
@@ -175,7 +176,12 @@
         }
         async function deleteData(id){
             try{
-                const response=await axios.delete(`http://localhost:5500/delete_expense/${id}`);
+                const token=localStorage.getItem('token');
+                const response=await axios.delete(`http://localhost:5500/delete_expense/${id}`,{
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
             }
             catch(error){
                 console.log(error);
