@@ -35,6 +35,9 @@
         margin-top: 57px;
         margin-left: 55px;
     }
+    button#buttn {
+        margin-top: 11px;
+    }
 </style>
 <body>
     <form class="signUp-form" action="/login" method="POST">
@@ -54,6 +57,7 @@
                 </div>
             
                 <button type="submit" id="buttn" class="btn btn-primary">login</button>
+                <button typel="submit" id="forgetButton">Forget password</button>
                 <p id="errorMess" style="color: red;"></p>
                 <div class="loginPage">
                     <h5>Don't have an account <a href="/SignUp">Sign up</a></h5>
@@ -63,6 +67,12 @@
       </form>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
       <script>
+        const forgetPass=document.getElementById('forgetButton');
+        forgetPass.addEventListener('click',forgetPassword);
+        async function forgetPassword(e){
+            e.preventDefault();
+            window.location.href="/forgetPass";
+        }
         const buttn=document.getElementById('buttn');
         buttn.addEventListener('click',loginSuccess);
         async function loginSuccess(e) {
