@@ -3,6 +3,8 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const bodyParser = require('body-parser');
+const dotenv = require('dotenv');
+dotenv.config();
 const cors = require('cors');
 const sequelize = require('./util/database');
 const signRoutes = require('./routes/signUp');
@@ -12,6 +14,7 @@ const PremiumRoutes=require('./routes/premium');
 const forgetPassRoutes=require('./routes/forgetPass');
 const ExpenseData=require('./model/expenseData');
 const Login=require('./model/loginDetails');
+const forgotPassword=require('./model/forgetPass');
 const totalExps=require('./model/totalExpenses');
 const premium=require('./model/order');
 const getAllDataRouter=require('./routes/getUserData');
@@ -23,7 +26,7 @@ app.use(loginRoutes);
 app.use(PremiumRoutes);
 app.use(expenseRoutes);
 app.use(getAllDataRouter);
-app.use(forgetPassRoutes);
+app.use('/password',forgetPassRoutes);
 app.use('/login',(req, res, next) => {
     res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
@@ -49,6 +52,9 @@ premium.belongsTo(Login);
 Login.hasOne(totalExps);
 totalExps.belongsTo(Login);
 
+
+Login.hasMany(forgotPassword);
+forgotPassword.belongsTo(Login);
 sequelize.sync({force:true})
 .then(() => {
     console.log('Data sync successful');
