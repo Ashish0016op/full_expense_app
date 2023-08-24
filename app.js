@@ -39,6 +39,9 @@ app.use('/premiumDash',(req,res,next)=>{
 app.use('/forgetPass',(req,res,next)=>{
     res.sendFile(path.join(__dirname,'views','forgetPass.html'));
 })
+app.use('/expensesDetails',(req,res,next)=>{
+    res.sendFile(path.join(__dirname,'views','expenseDetails.html'));
+})
 app.use((req, res, next) => {
     res.sendFile(path.join(__dirname, 'views', 'SignUp.html'));
 });
