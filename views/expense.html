@@ -59,7 +59,20 @@
     <div class="detailContainer">
         <h2 id="form2">Expenses Details</h2>
         <ul id="addExpensesDetails"></ul>
-        <div id="pagination"></div>
+        <div class="flexpage" style="display: flex;">
+            <div id="pagination"></div>
+            <div class="noOfExpenseToShow">
+                <select name="chooseOption" id="selectNoOfExpensesToShow">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+        </div>
+            
+        
     </div>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
@@ -135,61 +148,74 @@
             }
                 
         }
-        document.addEventListener('DOMContentLoaded',fetchData);
-        async function fetchData(e){
+        buttn.addEventListener('click', postData);
+
+        async function postData(e) {
             e.preventDefault();
-            try{
-                const page=1;
-                const token=localStorage.getItem('token');
-                const response = await axios.get(`http://localhost:5500/get_expense?page=${page}`, {
+            const expenseAmount = document.getElementById('expenseAmount').value;
+            const Description = document.getElementById('chooseDescription').value;
+            const category = document.getElementById('category').value;
+            const data = {
+                "expense_amount": expenseAmount,
+                "description": Description,
+                "category": category,
+            };
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.post('http://localhost:5500/expense', data, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                const paginationData = {
-                    currentPage: parseInt(response.data.currentPage),
-                    itemsPerPage: parseInt(response.data.itemsPerPage),
-                    totalItems: parseInt(response.data.totalItems),
-                    hasNextPage: response.data.hasNextPage,
-                    nextPage: parseInt(response.data.nextPage), // Parse as number
-                    hasPreviousPage: response.data.hasPreviousPage,
-                    previousPage: parseInt(response.data.previousPage), // Parse as number
-                    lastPage: parseInt(response.data.lastPage) // Parse as number
-                };
-                console.log(paginationData.hasNextPage)
 
-                await showPagination(paginationData);
-                const isPrem=localStorage.getItem('isPremium');
-                if(isPrem==='true'){
-                    window.location.href='/premiumDash';
-                }
-                const getExpense = response.data.getExpense;
                 const addExpensesDetails = document.getElementById('addExpensesDetails');
-                addExpensesDetails.innerHTML = '';
-
-                getExpense.forEach(expense => {
-                    const list = document.createElement('li');
-                    const btn = document.createElement('button');
-                    btn.textContent = 'Delete expense';
-
-                    btn.addEventListener('click', async () => {
-                        list.remove();
-                        await deleteData(expense.id);
-                    });
-
-                    list.innerHTML = `
-                        ${expense.expense_amount} - 
-                        ${expense.description} - 
-                        ${expense.category} - `;
-
-                    list.appendChild(btn);
-                    addExpensesDetails.appendChild(list);
+                const list = document.createElement('li');
+                const btn = document.createElement('button');
+                btn.addEventListener('click', async () => {
+                    list.remove();
+                    await deleteData(response.data.expenseData.response.id);
                 });
-
-            }catch(error){
+                btn.textContent = 'Delete expense';
+                list.innerHTML = `${expenseAmount} - ${Description} - ${category} - `;
+                list.appendChild(btn);
+                addExpensesDetails.appendChild(list);
+            } catch (error) {
                 console.log(error);
             }
         }
+
+        const itemsPerPageSelect = document.getElementById('selectNoOfExpensesToShow');
+        itemsPerPageSelect.addEventListener('change', fetchData);
+        document.addEventListener('DOMContentLoaded', fetchData);
+
+        async function fetchData(e) {
+            e.preventDefault();
+            try {
+                const page = 1;
+                const itemsPerPageSelect = document.getElementById('selectNoOfExpensesToShow');
+                const itemsPerPage = parseInt(itemsPerPageSelect.value);
+                console.log(itemsPerPage);
+                const token = localStorage.getItem('token');
+                const response = await axios.get(`http://localhost:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                showPagination(response.data);
+                const isPrem = localStorage.getItem('isPremium');
+                if (isPrem === 'true') {
+                    window.location.href = '/premiumDash';
+                }
+
+                const getExpense = response.data.getExpense;
+                updateUI(getExpense);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
         function showPagination({
             currentPage,
             hasNextPage,
@@ -197,47 +223,63 @@
             hasPreviousPage,
             previousPage,
             lastPage
-        }){
-            const pagination=document.getElementById('pagination');
-            pagination.innerHTML='';
-            if(hasPreviousPage){
-                const btn2=document.createElement('button');
-                btn2.textContent='Pre';
-                btn2.addEventListener('click',()=>getDetails(previousPage));
+        }) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            if (hasPreviousPage) {
+                const btn2 = document.createElement('button');
+                btn2.textContent = 'Pre';
+                btn2.addEventListener('click', () => getDetailsPage(previousPage));
                 pagination.appendChild(btn2);
             }
-            const btn1=document.createElement('button');
-            btn1.innerHTML=currentPage;
-            btn1.addEventListener('click',()=>getDetails(currentPage));
+
+            const btn1 = document.createElement('button');
+            btn1.innerHTML = currentPage;
+            btn1.addEventListener('click', () => getDetailsPage(currentPage));
             pagination.appendChild(btn1);
-            if(hasNextPage){
-                const btn3=document.createElement('button');
-                btn3.textContent='Next';
-                btn3.addEventListener('click',()=>getDetails(nextPage));
+
+            if (hasNextPage) {
+                const btn3 = document.createElement('button');
+                btn3.textContent = 'Next';
+                btn3.addEventListener('click', () => getDetailsPage(nextPage));
                 pagination.appendChild(btn3);
             }
         }
+
         async function updateUI(expenses) {
             const addExpensesDetails = document.getElementById('addExpensesDetails');
             addExpensesDetails.innerHTML = '';
 
             expenses.forEach(expense => {
                 const list = document.createElement('li');
-                list.textContent = `${expense.expense_amount} - ${expense.description} - ${expense.category}`;
+                const btn = document.createElement('button');
+                btn.textContent = 'Delete expense';
+
+                btn.addEventListener('click', async () => {
+                    list.remove();
+                    await deleteData(expense.id);
+                });
+
+                list.innerHTML = `${expense.expense_amount} - ${expense.description} - ${expense.category} - `;
+                list.appendChild(btn);
                 addExpensesDetails.appendChild(list);
             });
         }
 
-        async function getDetails(page) {
+        async function getDetailsPage(page) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get(`http://localhost:5500/get_expense?page=${page}`, {
+                const itemsPerPageSelect = document.getElementById('selectNoOfExpensesToShow');
+                const itemsPerPage = parseInt(itemsPerPageSelect.value);
+
+                const response = await axios.get(`http://localhost:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
 
-                await updateUI(response.data.getExpense);
+                updateUI(response.data.getExpense);
                 showPagination({
                     currentPage: response.data.currentPage,
                     itemsPerPage: response.data.itemsPerPage,
@@ -252,18 +294,17 @@
                 console.log(error);
             }
         }
-        async function deleteData(id){
-            try{
-                const token=localStorage.getItem('token');
 
-                const response=await axios.delete(`http://localhost:5500/delete_expense/${id}`,{
+        async function deleteData(id) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.delete(`http://localhost:5500/delete_expense/${id}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                console.log(token);
-            }
-            catch(error){
+                console.log(response);
+            } catch (error) {
                 console.log(error);
             }
         }

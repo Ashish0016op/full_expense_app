@@ -47,26 +47,27 @@ exports.getDetails = async (req, res, next) => {
         const userId = decodedToken.id;
 
         const page = parseInt(req.query.page) || 1;
-        const itemsPerPage = 6;
+        const itemsPerPages = parseInt(req.query.itemsPerPage);
+        console.log("size is",itemsPerPages);
 
-        const offset = (page - 1) * itemsPerPage;
+        const offset = (page - 1) * itemsPerPages;
         
         const { count, rows: expenses } = await expenseDetails.findAndCountAll({
             where: { signupDatumId: userId },
-            limit: itemsPerPage,
+            limit: itemsPerPages,
             offset: offset
         });
 
         res.json({
             getExpense: expenses,
             currentPage: page,
-            itemsPerPage: itemsPerPage,
+            itemsPerPage: itemsPerPages,
             totalItems: count,
-            hasNextPage: itemsPerPage * page < count,
+            hasNextPage: itemsPerPages * page < count,
             nextPage: page + 1,
             hasPreviousPage: page > 1,
             previousPage: page - 1,
-            lastPage: Math.ceil(count / itemsPerPage)
+            lastPage: Math.ceil(count / itemsPerPages)
         });
     } catch (error) {
         console.log(error);
