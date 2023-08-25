@@ -40,17 +40,41 @@ exports.postDetails=async (req,res,next)=>{
         console.log(error);
     }
 }
-exports.getDetails= async (req,res,next)=>{
-    try{
+exports.getDetails = async (req, res, next) => {
+    try {
         const token = req.header('Authorization').replace('Bearer ', '');
         const decodedToken = jwt.verify(token, config.secretKey);
         const userId = decodedToken.id;
-        const getExpense=await expenseDetails.findAll({where:{signupDatumId: userId}});
-        res.status(200).json({getExpense});
-    }catch(error){
+
+        const page = parseInt(req.query.page) || 1;
+        const itemsPerPage = 6;
+
+        const offset = (page - 1) * itemsPerPage;
+        
+        const { count, rows: expenses } = await expenseDetails.findAndCountAll({
+            where: { signupDatumId: userId },
+            limit: itemsPerPage,
+            offset: offset
+        });
+
+        res.json({
+            getExpense: expenses,
+            currentPage: page,
+            itemsPerPage: itemsPerPage,
+            totalItems: count,
+            hasNextPage: itemsPerPage * page < count,
+            nextPage: page + 1,
+            hasPreviousPage: page > 1,
+            previousPage: page - 1,
+            lastPage: Math.ceil(count / itemsPerPage)
+        });
+    } catch (error) {
         console.log(error);
+        res.status(500).json({ error: 'An error occurred' });
     }
+
 }
+
 function uploadToS3(data,filename){
     const BUCKET_NAME='expensetracker.123';
     const IAM_USER_KEY='AKIAYHCQ5VATIA5Y3RUC';
