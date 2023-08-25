@@ -2,6 +2,7 @@ const expenseDetails=require('../model/expenseData');
 const expsAmt=require('../model/totalExpenses');
 const config=require('../configuration/config');
 const jwt=require('jsonwebtoken');
+const AWS=require('aws-sdk');
 exports.postDetails=async (req,res,next)=>{
     try{
         const expenseAmt=req.body.expense_amount;
@@ -48,6 +49,55 @@ exports.getDetails= async (req,res,next)=>{
         res.status(200).json({getExpense});
     }catch(error){
         console.log(error);
+    }
+}
+function uploadToS3(data,filename){
+    const BUCKET_NAME='expensetracker.123';
+    const IAM_USER_KEY='AKIAYHCQ5VATIA5Y3RUC';
+    const IAM_USER_SECRET='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';
+
+    let s3bucket=new AWS.S3({
+        accessKeyId:IAM_USER_KEY,
+        secretAccessKey:IAM_USER_SECRET,
+        Bucket:BUCKET_NAME
+    })
+    s3bucket.createBucket(()=>{
+        var params={
+            Bucket:BUCKET_NAME,
+            Key:filename,
+            Body:data,
+            ACL:'public-read'
+        }
+        return new Promise((resolve,reject)=>{
+            s3bucket.upload(params,(err,s3response)=>{
+                if(err){
+                    console.log('somthing is wrong',err);
+                    reject(err);
+                }else{
+                    console.log('success',s3response);
+                    resolve(s3response.Location);
+                }
+            })
+        })
+            
+    })
+}
+exports.downloadExpense=async(req,res,next)=>{
+    try{
+        const token = req.header('Authorization').replace('Bearer ', '');
+            const decodedToken = jwt.verify(token, config.secretKey);
+            const userId = decodedToken.id;
+            const getExpense=await expenseDetails.findAll();
+            const stringifyExpense=JSON.stringify(getExpense);
+
+            const filename=`Expense${userId}/${new Date()}.txt`;
+            const fileURL=await uploadToS3(stringifyExpense,filename);
+            res.status(200).json({fileURL,success:true});
+        
+        console.log(getExpense);
+    }catch(err){
+        console.log(err);
+        res.status(500).json({fileURL,success:false});
     }
 }
 exports.deleteDetails = async (req, res, next) => {

@@ -54,6 +54,7 @@
             <div class="premiumUser">
                 <h3>you are a premium user</h3>
                 <button type="submit" id="showLeaderBoard">ShowLeaderBoard</button>
+                <button type="submit" id="downloadExpense">download</button>
                 <button type="submit" id="expenseDetails">expensesDetails</button>
             </div>
             
@@ -67,6 +68,25 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
     <script>
+        const downloadExp=document.getElementById('downloadExpense');
+        downloadExp.addEventListener('click',downloadExpense);
+        async function downloadExpense(e){
+            e.preventDefault();
+            try{
+                const token=localStorage.getItem('token');
+                const response=await axios.get('http://localhost:5500/download',{
+                    headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                });
+                var a=document.createElement('a');
+                a.href=response.data.fileURL;
+                a.download='myexpense.csv';
+                a.click();
+            }catch(err){
+                console.log(err);
+            }
+        }
         const expensesDetails=document.getElementById('expenseDetails');
         expensesDetails.addEventListener('click',showDetails);
         async function showDetails(e){
