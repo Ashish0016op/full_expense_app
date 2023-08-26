@@ -5,7 +5,9 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start": "BUCKET_NAME=expensetracker.123 IAM_USER_KEY=AKIAYHCQ5VATIA5Y3RUC IAM_USER_SECRET=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 SENDGRID_API_KEY=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 kEY_ID=rzp_test_qxOfOsgfsLuEmJ KEY_SECRET=HkFByz1MiTN8wO0kFM5wYBUw node app.js",
+    "start-server": "node app.js",
+    "start:dev": "nodemon app.js"
   },
   "author": "Ashish kumar",
   "license": "ISC",
@@ -14,11 +16,15 @@
     "aws-sdk": "^2.1444.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "compression": "^1.7.4",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.1",
+    "morgan": "^1.10.0",
     "mysql2": "^3.6.0",
     "nodemon": "^3.0.1",
     "path": "^0.12.7",

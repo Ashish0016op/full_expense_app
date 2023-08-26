@@ -5,8 +5,8 @@ const loginModel=require('../model/loginDetails');
 exports.purchasePremium = async (req, res, next) => {
     try {
         var instance = new rzp({
-            key_id: 'rzp_test_qxOfOsgfsLuEmJ',
-            key_secret: 'HkFByz1MiTN8wO0kFM5wYBUw'
+            key_id: process.env.KEY_ID,
+            key_secret: process.env.KEY_SECRET
         });
 
         const amount = 2500;
@@ -23,7 +23,7 @@ exports.purchasePremium = async (req, res, next) => {
                     status: 'PENDING'
                 });
 
-                return res.status(201).json({ order: rzpOrder, key_id: 'rzp_test_qxOfOsgfsLuEmJ' });
+                return res.status(201).json({ order: rzpOrder, key_id: process.env.KEY_ID });
             } catch (err) {
                 console.error(err);
                 return res.status(500).json({ error: 'Error creating order' });

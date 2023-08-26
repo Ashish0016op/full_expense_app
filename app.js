@@ -18,6 +18,17 @@ const forgotPassword=require('./model/forgetPass');
 const totalExps=require('./model/totalExpenses');
 const premium=require('./model/order');
 const getAllDataRouter=require('./routes/getUserData');
+const helmet=require('helmet');
+const compression=require('compression');
+const morgan=require('morgan');
+const fs=require('fs');
+// const accessLogStream=fs.createReadStream(
+//     path.join(__dirname,'access.log'),
+//     {flags:'a'}
+// );
+app.use(helmet());
+app.use(compression());
+//app.use(morgan('combined',{stream:accessLogStream}))
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
