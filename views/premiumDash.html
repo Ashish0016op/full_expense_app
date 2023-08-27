@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expenses</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <style>
     body {
@@ -47,6 +48,7 @@
                 <option id="fuel">fuel</option>
                 <option id="electricity">electricity</option>
                 <option id="movie">movie</option>
+                <option id="Income">Income</option>
             </select><br>
             <div id="premiumButtn">
                 <button type="submit" id="buttn">Add Expenses</button>
@@ -63,10 +65,21 @@
     <div class="detailContainer">
         <h2 id="form2">Expenses Details</h2>
         <ul id="addExpensesDetails"></ul>
+        <div class="flexpage" style="display: flex;">
+            <div id="pagination"></div>
+            <div class="noOfExpenseToShow">
+                <select name="chooseOption" id="selectNoOfExpensesToShow">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+        </div>
     </div>
     <div id="leaderboard"></div>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
     <script>
         const downloadExp=document.getElementById('downloadExpense');
         downloadExp.addEventListener('click',downloadExpense);
@@ -104,20 +117,15 @@
                 e.preventDefault();
                 try {
                     const token = localStorage.getItem('token');
-                    const response = await fetch('http://localhost:5500/AllData', {
+                    const response = await axios.get('http://localhost:5500/AllData', {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     });
-
-                    if (!response.ok) {
-                        throw new Error(`Error fetching data: ${response.statusText}`);
-                    }
-
-                    const data = await response.json();
-                    console.log(data);
+                    console.log(response.data);
+                    const data = response.data;
                     leaderboardContainer.innerHTML = '';
-
+                    
                     data.forEach((user, index) => {
                         const userDiv = document.createElement('div');
                         userDiv.className = 'user-entry';
@@ -167,41 +175,112 @@
             }
                 
         }
-        document.addEventListener('DOMContentLoaded',fetchData);
-        async function fetchData(e){
+        const itemsPerPageSelect = document.getElementById('selectNoOfExpensesToShow');
+        itemsPerPageSelect.addEventListener('change', fetchData);
+        document.addEventListener('DOMContentLoaded', fetchData);
+
+        async function fetchData(e) {
             e.preventDefault();
-            try{
-                const token=localStorage.getItem('token');
-                const response = await axios.get('http://localhost:5500/get_expense', {
+            try {
+                const page = 1;
+                const itemsPerPageSelect = document.getElementById('selectNoOfExpensesToShow');
+                const itemsPerPage = parseInt(itemsPerPageSelect.value);
+                console.log(itemsPerPage);
+                const token = localStorage.getItem('token');
+                const response = await axios.get(`http://localhost:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+                console.log(response.data);
+                showPagination(response.data);
+                const isPrem = localStorage.getItem('isPremium');
+                if (isPrem === 'true') {
+                    window.location.href = '/premiumDash';
+                }
+
                 const getExpense = response.data.getExpense;
+                updateUI(getExpense);
+            } catch (error) {
+                console.log(error);
+            }
+        }
 
-                const addExpensesDetails = document.getElementById('addExpensesDetails');
-                addExpensesDetails.innerHTML = '';
+        function showPagination({
+            currentPage,
+            hasNextPage,
+            nextPage,
+            hasPreviousPage,
+            previousPage,
+            lastPage
+        }) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
 
-                getExpense.forEach(expense => {
-                    const list = document.createElement('li');
-                    const btn = document.createElement('button');
-                    btn.textContent = 'Delete expense';
+            if (hasPreviousPage) {
+                const btn2 = document.createElement('button');
+                btn2.textContent = 'Pre';
+                btn2.addEventListener('click', () => getDetailsPage(previousPage));
+                pagination.appendChild(btn2);
+            }
 
-                    btn.addEventListener('click', async () => {
-                        list.remove();
-                        await deleteData(expense.id);
-                    });
+            const btn1 = document.createElement('button');
+            btn1.innerHTML = currentPage;
+            btn1.addEventListener('click', () => getDetailsPage(currentPage));
+            pagination.appendChild(btn1);
 
-                    list.innerHTML = `
-                        ${expense.expense_amount} - 
-                        ${expense.description} - 
-                        ${expense.category} - `;
+            if (hasNextPage) {
+                const btn3 = document.createElement('button');
+                btn3.textContent = 'Next';
+                btn3.addEventListener('click', () => getDetailsPage(nextPage));
+                pagination.appendChild(btn3);
+            }
+        }
 
-                    list.appendChild(btn);
-                    addExpensesDetails.appendChild(list);
+        async function updateUI(expenses) {
+            const addExpensesDetails = document.getElementById('addExpensesDetails');
+            addExpensesDetails.innerHTML = '';
+
+            expenses.forEach(expense => {
+                const list = document.createElement('li');
+                const btn = document.createElement('button');
+                btn.textContent = 'Delete expense';
+
+                btn.addEventListener('click', async () => {
+                    list.remove();
+                    await deleteData(expense.id);
                 });
 
-            }catch(error){
+                list.innerHTML = `${expense.expense_amount} - ${expense.description} - ${expense.category} - `;
+                list.appendChild(btn);
+                addExpensesDetails.appendChild(list);
+            });
+        }
+
+        async function getDetailsPage(page) {
+            try {
+                const token = localStorage.getItem('token');
+                const itemsPerPageSelect = document.getElementById('selectNoOfExpensesToShow');
+                const itemsPerPage = parseInt(itemsPerPageSelect.value);
+
+                const response = await axios.get(`http://localhost:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                updateUI(response.data.getExpense);
+                showPagination({
+                    currentPage: response.data.currentPage,
+                    itemsPerPage: response.data.itemsPerPage,
+                    totalItems: response.data.totalItems,
+                    hasNextPage: response.data.hasNextPage,
+                    nextPage: response.data.nextPage,
+                    hasPreviousPage: response.data.hasPreviousPage,
+                    previousPage: response.data.previousPage,
+                    lastPage: response.data.lastPage
+                });
+            } catch (error) {
                 console.log(error);
             }
         }

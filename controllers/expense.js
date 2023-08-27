@@ -3,6 +3,7 @@ const expsAmt=require('../model/totalExpenses');
 const config=require('../configuration/config');
 const jwt=require('jsonwebtoken');
 const AWS=require('aws-sdk');
+const { use } = require('../routes/expense');
 exports.postDetails=async (req,res,next)=>{
     try{
         const expenseAmt=req.body.expense_amount;
@@ -19,14 +20,14 @@ exports.postDetails=async (req,res,next)=>{
             
         })
         const totalExpRecord = await expsAmt.findOne({where:{signupDatumId:userId}});
-        let totalExp = 0;
-        if (totalExpRecord) {
-            totalExp = totalExpRecord.totalExpense + parseInt(expenseAmt);
-        } else {
-            totalExp = parseInt(expenseAmt);
+        let totalExp;
+        if(cat!=='Income'){
+            if (totalExpRecord) {
+                totalExp = totalExpRecord.totalExpense + parseInt(expenseAmt);
+            } else {
+                totalExp = parseInt(expenseAmt);
+            }
         }
-
-        // Update or create the total expenses record
         if (totalExpRecord) {
             await totalExpRecord.update({ totalExpense: totalExp });
         } else {
@@ -40,6 +41,7 @@ exports.postDetails=async (req,res,next)=>{
         console.log(error);
     }
 }
+
 exports.getDetails = async (req, res, next) => {
     try {
         const token = req.header('Authorization').replace('Bearer ', '');
@@ -57,7 +59,6 @@ exports.getDetails = async (req, res, next) => {
             limit: itemsPerPages,
             offset: offset
         });
-
         res.json({
             getExpense: expenses,
             currentPage: page,
@@ -147,9 +148,11 @@ exports.deleteDetails = async (req, res, next) => {
             }
             await expenseToDelete.destroy({ transaction });
             const totalExpRecord = await expsAmt.findOne({where:{signupDatumId:userId}});
-            if (totalExpRecord) {
-                totalExpRecord.totalExpense -= expenseToDelete.expense_amount;
-                await totalExpRecord.save({ transaction });
+            if(expenseToDelete.category!=='Income'){
+                if (totalExpRecord) {
+                    totalExpRecord.totalExpense -= expenseToDelete.expense_amount;
+                    await totalExpRecord.save({ transaction });
+                }
             }
             await transaction.commit();
 

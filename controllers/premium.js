@@ -5,12 +5,11 @@ const loginModel=require('../model/loginDetails');
 exports.purchasePremium = async (req, res, next) => {
     try {
         var instance = new rzp({
-            key_id: process.env.KEY_ID,
-            key_secret: process.env.KEY_SECRET
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET
         });
-
         const amount = 2500;
-
+        console.log(instance);
         instance.orders.create({ amount, currency: "INR" }, async (err, rzpOrder) => {
             if (err) {
                 console.error(err);
@@ -23,7 +22,7 @@ exports.purchasePremium = async (req, res, next) => {
                     status: 'PENDING'
                 });
 
-                return res.status(201).json({ order: rzpOrder, key_id: process.env.KEY_ID });
+                return res.status(201).json({ order: rzpOrder, key_id: process.env.RAZORPAY_KEY_ID });
             } catch (err) {
                 console.error(err);
                 return res.status(500).json({ error: 'Error creating order' });

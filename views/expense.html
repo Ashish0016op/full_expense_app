@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://cdnjs.cloudflare.com;">
     <title>Expenses</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <style>
     body {
@@ -76,7 +76,6 @@
         
     </div>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
     <script>
         const premiumButton=document.getElementById('premiumButton');
         premiumButton.addEventListener('click',getPremium);
@@ -149,42 +148,6 @@
             }
                 
         }
-        buttn.addEventListener('click', postData);
-
-        async function postData(e) {
-            e.preventDefault();
-            const expenseAmount = document.getElementById('expenseAmount').value;
-            const Description = document.getElementById('chooseDescription').value;
-            const category = document.getElementById('category').value;
-            const data = {
-                "expense_amount": expenseAmount,
-                "description": Description,
-                "category": category,
-            };
-
-            try {
-                const token = localStorage.getItem('token');
-                const response = await axios.post('http://localhost:5500/expense', data, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                const addExpensesDetails = document.getElementById('addExpensesDetails');
-                const list = document.createElement('li');
-                const btn = document.createElement('button');
-                btn.addEventListener('click', async () => {
-                    list.remove();
-                    await deleteData(response.data.expenseData.response.id);
-                });
-                btn.textContent = 'Delete expense';
-                list.innerHTML = `${expenseAmount} - ${Description} - ${category} - `;
-                list.appendChild(btn);
-                addExpensesDetails.appendChild(list);
-            } catch (error) {
-                console.log(error);
-            }
-        }
 
         const itemsPerPageSelect = document.getElementById('selectNoOfExpensesToShow');
         itemsPerPageSelect.addEventListener('change', fetchData);
@@ -203,7 +166,7 @@
                         'Authorization': `Bearer ${token}`
                     }
                 });
-
+                console.log(response.data);
                 showPagination(response.data);
                 const isPrem = localStorage.getItem('isPremium');
                 if (isPrem === 'true') {

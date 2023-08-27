@@ -1,7 +1,8 @@
 const Sequelize=require('sequelize');
-const loginCred=new Sequelize('expense-db','root','Ashish8298',{
+console.log(process.env.DB_PASSWORD)
+const loginCred=new Sequelize(process.env.DB_NAME,process.env.DB_USERNAME,process.env.DB_PASSWORD,{
     dialect:'mysql',
-    host:'localhost'
+    host:process.env.DB_HOST
 })
 
 module.exports=loginCred;

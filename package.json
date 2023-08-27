@@ -5,9 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "BUCKET_NAME=expensetracker.123 IAM_USER_KEY=AKIAYHCQ5VATIA5Y3RUC IAM_USER_SECRET=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 SENDGRID_API_KEY=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 kEY_ID=rzp_test_qxOfOsgfsLuEmJ KEY_SECRET=HkFByz1MiTN8wO0kFM5wYBUw node app.js",
-    "start-server": "node app.js",
-    "start:dev": "nodemon app.js"
+    "start": "nodemon app.js",
+    "start-server": "node app.js"
   },
   "author": "Ashish kumar",
   "license": "ISC",

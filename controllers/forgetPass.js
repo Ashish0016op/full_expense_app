@@ -6,46 +6,40 @@ const bcrypt = require('bcrypt');
 const User = require('../model/loginDetails');
 const Forgotpassword = require('../model/forgetPass');
 
- // Replace with your SendGrid API key
-
  const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+ const forgotpassword = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        const signupData = await User.findOne({ where: { email } });
 
- const forgotpassword = async (req, res) => {
-     try {
-         const { email } = req.body;
-         const signupData = await User.findOne({ where: { email } });
- 
-         if (signupData) {
-             const id = uuid.v4();
-             await signupData.createForgotpassword({ id, active: true }); // Use await to handle promise
- 
-             sgMail.setApiKey(SENDGRID_API_KEY);
- 
-             const msg = {
-                 to: email,
-                 from: 'raccoonop0016@gmail.com',
-                 subject: 'Password Reset',
-                 text: 'Click the link below to reset your password:',
-                 html: `<a href="http://localhost:5500/password/resetpassword/${id}">Reset Password</a>`,
-             };
- 
-             await sgMail.send(msg); // Use await to handle promise
- 
-             res.status(200).json({ message: 'Password reset email sent successfully.', success: true });
-         } else {
-             res.status(404).json({ message: 'User does not exist.', success: false });
-         }
-     } catch (error) {
-         console.error(error);
-         res.status(500).json({ error: 'Server error.', success: false });
-     }
- };
+        if (signupData) {
+            const id = uuid.v4();
+            const response = await Forgotpassword.create({ id, active: true, signupDatumId: signupData.id });
 
-// Other functions (resetpassword, updatepassword) remain the same
+            sgMail.setApiKey(SENDGRID_API_KEY); // Make sure SENDGRID_API_KEY is defined
+
+            const msg = {
+                to: email,
+                from: 'raccoonop0016@gmail.com',
+                subject: 'Password Reset',
+                text: 'Click the link below to reset your password:',
+                html: `<a href="http://localhost:5500/password/resetpassword/${id}">Reset Password</a>`,
+            };
+
+            await sgMail.send(msg);
+
+            res.status(200).json({ message: 'Password reset email sent successfully.', success: true });
+        } else {
+            res.status(404).json({ message: 'User does not exist.', success: false });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error.', success: false });
+    }
+};
 
 
-
-const resetpassword = (req, res) => {
+const resetpassword = (req, res,next) => {
     const id =  req.params.id;
     const token = req.params.token;
     Forgotpassword.findOne({ where: { token } }).then(forgotpasswordrequest => {
@@ -72,7 +66,7 @@ const resetpassword = (req, res) => {
     })
 }
 
-const updatepassword = (req, res) => {
+const updatepassword = (req, res,next) => {
 
     try {
         const { newpassword } = req.query;

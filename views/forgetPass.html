@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <form action="/forgetPassword", method="POST">
         <input type="email" id="sendEmail" name="email" required>
         <button type="submit" id="buttn"> Send Mail</button>
     </form>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         const buttn=document.getElementById('buttn');
         buttn.addEventListener('click',forgotpassword);
@@ -24,11 +24,13 @@
                     email: email
 
                 }
-                console.log(userDetails)
-                const headers = {
-                    Authorization: 'Bearer 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',
-                };
-                const response=await axios.post('http://localhost:5500/password/forgotpassword',userDetails,{headers});
+                const token=localStorage.getItem('token');
+                const response=await axios.post('http://localhost:5500/forgotpassword',userDetails,{
+                    headers : {
+                        Authorization: `Bearer ${token}`,
+                    }
+                });
+                console.log(response);
                 if(response.status === 200){
                     document.body.innerHTML += '<div style="color:red;">Mail Successfuly sent <div>'
                 } else {
