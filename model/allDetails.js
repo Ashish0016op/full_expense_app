@@ -15,4 +15,5 @@ const AllDetails=sequelize.define('allDetails',{
         type:Sequelize.INTEGER,
         allowNull:false
     },
+    
 })

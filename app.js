@@ -27,7 +27,7 @@ const fs=require('fs');
 //     {flags:'a'}
 // );
 //app.use(helmet());
-//app.use(compression());
+app.use(compression());
 //app.use(morgan('combined',{stream:accessLogStream}))
 app.use(cors());
 app.use(express.json());
@@ -69,7 +69,7 @@ totalExps.belongsTo(Login);
 
 Login.hasMany(forgotPassword);
 forgotPassword.belongsTo(Login);
-sequelize.sync({force:true})
+sequelize.sync({force:false})
 .then(() => {
     console.log('Data sync successful');
     app.listen(5500, () => {
