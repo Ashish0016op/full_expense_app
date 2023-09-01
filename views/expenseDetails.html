@@ -80,6 +80,7 @@
                     <th>Income</th>
                     <th>Expense</th>
                 </tr>
+                
             </thead>
             <tbody id="expensesBody">
             </tbody>
@@ -110,7 +111,7 @@
             const page = 1;
             const itemsPerPage = 10;
 
-            axios.get(`http://localhost:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
+            axios.get(`http://50.19.191.228:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -153,8 +154,8 @@
                             <td>${totalExpenses}</td>
                         `;
                         totalIncome+=expense.expense_amount;
+                        const totalIncomeRow=document.createElement('row');7
                         row.className='IncomeRow';
-                        
                         expensesBody.appendChild(row);
                     }
                     
@@ -163,14 +164,16 @@
                 const date = new Date(expense);
                  const month = monthNames[date.getMonth()]
                 console.log(expense);
-                const row2 = document.createElement('tr');
+                if(totalIncome!==0){
+                    const row2 = document.createElement('tr');
                     row2.innerHTML=`
                         <td>${month}</td>
                         <td>${totalIncome}</td>
                         <td>${totalExpenses}</td>
                         <td>${totalIncome-totalExpenses}</td>
                     `
-                expensesBody2.appendChild(row2);
+                    expensesBody2.appendChild(row2);
+                }
                 datePrint.innerHTML = new Date().toLocaleString();
             })
             .catch(error => {

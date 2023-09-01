@@ -148,7 +148,7 @@
             e.preventDefault();
             try{
                 const token=localStorage.getItem('token');
-                const response=await axios.get('http://localhost:5500/download',{
+                const response=await axios.get('http://50.19.191.228:5500/download',{
                     headers: {
                             Authorization: `Bearer ${token}`
                         }
@@ -178,7 +178,7 @@
                 e.preventDefault();
                 try {
                     const token = localStorage.getItem('token');
-                    const response = await axios.get('http://localhost:5500/AllData', {
+                    const response = await axios.get('http://50.19.191.228:5500/AllData', {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
@@ -215,7 +215,7 @@
                 }
             try{
                 const token=localStorage.getItem('token');
-                const response = await axios.post('http://localhost:5500/expense', data, {
+                const response = await axios.post('http://50.19.191.228:5500/expense', data, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -248,17 +248,14 @@
                 const itemsPerPage = parseInt(itemsPerPageSelect.value);
                 console.log(itemsPerPage);
                 const token = localStorage.getItem('token');
-                const response = await axios.get(`http://localhost:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
+                const response = await axios.get(`http://50.19.191.228:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
                 console.log(response.data);
                 showPagination(response.data);
-                const isPrem = localStorage.getItem('isPremium');
-                if (isPrem === 'true') {
-                    window.location.href = '/premiumDash';
-                }
+                
 
                 const getExpense = response.data.getExpense;
                 updateUI(getExpense);
@@ -324,7 +321,7 @@
                 const itemsPerPageSelect = document.getElementById('selectNoOfExpensesToShow');
                 const itemsPerPage = parseInt(itemsPerPageSelect.value);
 
-                const response = await axios.get(`http://localhost:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
+                const response = await axios.get(`http://50.19.191.228:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -348,7 +345,7 @@
         async function deleteData(id){
             try{
                 const token=localStorage.getItem('token');
-                const response=await axios.delete(`http://localhost:5500/delete_expense/${id}`,{
+                const response=await axios.delete(`http://50.19.191.228:5500/delete_expense/${id}`,{
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
