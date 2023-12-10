@@ -10,6 +10,7 @@ const totalExp=sequelize.define('TotalExpenses',{
     totalExpense:{
         type:Sequelize.INTEGER,
         allowNull:false
-    }
+    },
+    
 })
 module.exports=totalExp;

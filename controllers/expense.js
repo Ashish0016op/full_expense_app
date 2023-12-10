@@ -47,19 +47,24 @@ exports.getDetails = async (req, res, next) => {
         const token = req.header('Authorization').replace('Bearer ', '');
         const decodedToken = jwt.verify(token, config.secretKey);
         const userId = decodedToken.id;
-
+        console.log(userId);
+        console.log(token);
         const page = parseInt(req.query.page) || 1;
         const itemsPerPages = parseInt(req.query.itemsPerPage);
         console.log("size is",itemsPerPages);
 
         const offset = (page - 1) * itemsPerPages;
         
-        const { count, rows: expenses } = await expenseDetails.findAndCountAll({
+        const expenses = await expenseDetails.findAll({
             where: { signupDatumId: userId },
             limit: itemsPerPages,
             offset: offset
         });
-        res.json({
+        const count = await expenseDetails.count({
+            where: { signupDatumId: userId }
+        });
+
+        res.status(200).json({
             getExpense: expenses,
             currentPage: page,
             itemsPerPage: itemsPerPages,

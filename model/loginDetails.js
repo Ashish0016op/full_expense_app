@@ -1,6 +1,6 @@
 const Sequelize=require('sequelize');
 const sequelize=require('../util/database');
-const signCred=sequelize.define('signupData',{
+const signCred= sequelize.define('signupData',{
     id:{
         type:Sequelize.INTEGER,
         autoIncrement:true,
@@ -22,6 +22,6 @@ const signCred=sequelize.define('signupData',{
     isPremium:{
         type:Sequelize.BOOLEAN,
         defaultValue: false
-    }
+    },
 })
 module.exports=signCred;
