@@ -10,14 +10,14 @@ const Forgotpassword = require('../model/forgetPass');
  const forgotpassword = async (req, res, next) => {
     try {
         const { email } = req.body;
-        const signupData = await User.findOne({ where: { email } });
-
-        if (signupData) {
+        const userData = await User.findOne({ email });
+    
+        if (userData) {
             const id = uuid.v4();
-            const response = await Forgotpassword.create({ id, active: true, signupDatumId: signupData.id });
-
+            const response = await ForgotPassword.create({ id, active: true, userId: userData._id });
+    
             sgMail.setApiKey(SENDGRID_API_KEY); // Make sure SENDGRID_API_KEY is defined
-
+    
             const msg = {
                 to: email,
                 from: 'raccoonop0016@gmail.com',
@@ -25,9 +25,9 @@ const Forgotpassword = require('../model/forgetPass');
                 text: 'Click the link below to reset your password:',
                 html: `<a href="http://localhost:5500/password/resetpassword/${id}">Reset Password</a>`,
             };
-
+    
             await sgMail.send(msg);
-
+    
             res.status(200).json({ message: 'Password reset email sent successfully.', success: true });
         } else {
             res.status(404).json({ message: 'User does not exist.', success: false });

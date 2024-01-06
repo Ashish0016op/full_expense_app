@@ -1,27 +1,25 @@
-const Sequelize=require('sequelize');
-const sequelize=require('../util/database');
-const signCred= sequelize.define('signupData',{
-    id:{
-        type:Sequelize.INTEGER,
-        autoIncrement:true,
-        primaryKey:true,
-        allowNull:false
+const mongoose = require('mongoose');
+const Schema=mongoose.Schema;
+const signCredSchema = new mongoose.Schema({
+    Username: {
+        type: String,
+        required: true
     },
-    Username:{
-        type:Sequelize.STRING,
-        allowNull:false
+    email: {
+        type: String,
+        required: true
     },
-    email:{
-        type:Sequelize.STRING,
-        allowNull:false
+    password: {
+        type: String,
+        required: true
     },
-    password:{
-        type:Sequelize.STRING,
-        allowNull:false
+    isPremium: {
+        type: Boolean,
     },
-    isPremium:{
-        type:Sequelize.BOOLEAN,
-        defaultValue: false
-    },
-})
-module.exports=signCred;
+    totalExp: {
+        type: Schema.Types.ObjectId,
+        ref: 'TotalExpenses' 
+    }
+});
+
+module.exports = mongoose.model('signCred', signCredSchema);

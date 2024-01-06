@@ -1,19 +1,14 @@
-const Sequelize=require('sequelize');
-const sequelize=require('../util/database');
-const AllDetails=sequelize.define('allDetails',{
-    id:{
-        type:Sequelize.INTEGER,
-        autoIncrement:true,
-        allowNull:false,
-        primaryKey:true
-    },
+const mongoose=require('mongoose');
+
+const AllDetails=new mongoose.Schema({
     Name:{
-        tyep:Sequelize.STRING,
-        allowNull:false,
+        tyep:String,
+        require:true
     },
     totalAmount:{
-        type:Sequelize.INTEGER,
-        allowNull:false
+        type:Number,
+        require:true
     },
     
 })
+module.exports=mongoose.model('AllDetail',AllDetails);

@@ -1,0 +1,143 @@
+[33mcommit d92fba29f617b623a0cceddb7944b7a2abb74a38[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Sat Aug 26 16:02:03 2023 +0530
+
+    test2
+
+[33mcommit 1f8f6890ff6b3998691e2d2c1da4f70ad1220c85[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Sat Aug 26 15:59:34 2023 +0530
+
+    test
+
+[33mcommit d1f1fba65e69fa6a012b33e2571d1219fc6d1cdf[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Sat Aug 26 15:33:43 2023 +0530
+
+    Remove .env from repository
+
+[33mcommit 080d66ae6ba8a321d5646ed5fac3e7abf7a5e1e2[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Sat Aug 26 15:29:52 2023 +0530
+
+    check
+
+[33mcommit aa8045ccf04541c9abf00adc58a8860bb822159f[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Sat Aug 26 11:00:02 2023 +0530
+
+    live_commit
+
+[33mcommit 9535513b02bcb4c6b0dc36b4a8d4e2873d445cd4[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Fri Aug 25 19:50:21 2023 +0530
+
+    dynamicPagination_commit
+
+[33mcommit 86f9160db4497b293a627585fc36f8963578c245[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Fri Aug 25 18:46:14 2023 +0530
+
+    pagination_commit
+
+[33mcommit 9f06e5033bdf8fb99ce638a77f79c8379b4d20c5[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Fri Aug 25 14:31:29 2023 +0530
+
+    awsdownlad_commit
+
+[33mcommit f5450f805361dfee6567ab071087e56f30ceb989[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Thu Aug 24 16:01:51 2023 +0530
+
+    frontend_Expense_commit
+
+[33mcommit 29fe3ea3ef9352c61d22a9db351b841e50ffe50d[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Thu Aug 24 14:17:48 2023 +0530
+
+    resentPass_commit
+
+[33mcommit b6917ca0c7d4a9bb32df16dddc06174f8237efcb[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Wed Aug 23 11:06:30 2023 +0530
+
+    forget_page_commit
+
+[33mcommit 96df0bf87be6c60a002a00920bc29e5b13b4eb2c[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Tue Aug 22 20:47:33 2023 +0530
+
+    production_ready_commit
+
+[33mcommit 0595b7f58bcadb1c7d363b9509f1de64c226bf71[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Tue Aug 22 12:54:37 2023 +0530
+
+    final_leaderBoard_opt_commit
+
+[33mcommit 73944f49c38420e8063a8931fbecd5c8ccb2fa2c[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Tue Aug 22 10:58:56 2023 +0530
+
+    premium_commit
+
+[33mcommit eb1d327762fa088c603d2a64b50de92f150a0b83[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Mon Aug 21 19:05:45 2023 +0530
+
+    premium_feature_commit
+
+[33mcommit 3d4ad08ce5f4130353a3bd4b3fa336a2dda4a414[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Mon Aug 21 19:05:27 2023 +0530
+
+    PremiumFeature_commit
+
+[33mcommit f987487f401c637bb59e9ab7e2dd5f73c2c98f53[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Mon Aug 21 08:41:26 2023 +0530
+
+    razorpay_commit
+
+[33mcommit a669426dcdfafd755bc4f91299e2de63b5104354[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Sat Aug 19 19:36:25 2023 +0530
+
+    every_user_own_data_commit
+
+[33mcommit bcea8c285b25ca13f781ea2142dd9d90932fb427[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Sat Aug 19 09:00:00 2023 +0530
+
+    expense_commit
+
+[33mcommit 8f2b9d703d4a47b85e07c6689d122c465e0951d0[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Fri Aug 18 15:04:22 2023 +0530
+
+    login_encrypt_commit
+
+[33mcommit e96c2f485085538870c81a360288da02e799cf3a[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Fri Aug 18 15:03:33 2023 +0530
+
+    login_encrypt_commit
+
+[33mcommit 6d56887a6a2fc719e945304e088938bc7d61d4e3[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Fri Aug 18 09:58:43 2023 +0530
+
+    login_commit
+
+[33mcommit e0851910c08af438a19aaa70dec6275b25dcc883[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Thu Aug 17 20:48:48 2023 +0530
+
+    signUp_commit
+
+[33mcommit 42b3775ec4ff5bb55610f52d3482f9bbf1d43b55[m
+Author: Ashish0016op <raccoonop0016@gmail.com>
+Date:   Thu Aug 17 12:06:57 2023 +0530
+
+    signUp_commit
