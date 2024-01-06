@@ -1,7 +1,7 @@
 require('dotenv').config();
 const rzp = require('razorpay');
-const orderModel = require('../model/order');
-const loginModel=require('../model/loginDetails');
+const Order = require('../model/order');
+const User=require('../model/loginDetails');
 exports.purchasePremium = async (req, res, next) => {
     try {
         var instance = new rzp({
@@ -9,7 +9,6 @@ exports.purchasePremium = async (req, res, next) => {
             key_secret: process.env.RAZORPAY_KEY_SECRET
         });
         const amount = 2500;
-        console.log(instance);
         instance.orders.create({ amount, currency: "INR" }, async (err, rzpOrder) => {
             if (err) {
                 console.error(err);
@@ -17,7 +16,7 @@ exports.purchasePremium = async (req, res, next) => {
             }
 
             try {
-                await orderModel.create({
+                await Order.create({
                     orderid: rzpOrder.id,
                     status: 'PENDING'
                 });
@@ -37,17 +36,21 @@ exports.purchasePremium = async (req, res, next) => {
 exports.updateTransaction = async (req, res, next) => {
     try {
         const { payment_id, order_id } = req.body;
+        const updatedOrder = await Order.findOneAndUpdate(
+            { orderid: order_id },
+            { paymentid: payment_id, status: 'success' },
+            { new: true }
+        );
 
-        const foundOrder = await orderModel.findOne({ where: { orderid: order_id } });
-        if (!foundOrder) {
+        if (!updatedOrder) {
             return res.status(404).json({ error: 'Order not found' });
         }
-
-        await foundOrder.update({ paymentid: payment_id, status: 'success' });
-        await loginModel.update(
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id,
             { isPremium: true },
-            { where: { id: req.user.id } } // Update the specific user
+            { new: true }
         );
+
         return res.status(202).json({ success: true, message: 'Transaction successful' });
     } catch (error) {
         console.error(error);

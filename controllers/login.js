@@ -10,10 +10,12 @@ function generateAccessToken(id){
 exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        const user = await loginDetails.findOne({ where: { email } });
+        const user = await loginDetails.findOne({ email });
         if (!user) {
             return res.status(401).json({ error: 'Invalid credentials1' });
         }
+        console.log('Entered Password:', password);
+        console.log('Hashed Password from DB:', user.password);
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({ error: 'Invalid credentials2' });
@@ -31,7 +33,7 @@ exports.login = async (req, res, next) => {
 
 exports.getDetails = async (req, res, next) => {
     try {
-        const details = await loginDetails.findAll();
+        const details = await loginDetails.find();
         res.status(200).json({ userDetails: details });
     } catch (error) {
         console.error('Error fetching user details:', error);

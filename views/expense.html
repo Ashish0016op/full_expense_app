@@ -7,69 +7,112 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <style>
-    #head {
-        text-align: center;
-        color: white;
-        background-color: #098393;
-        margin-top: -22px;
-        margin-right: -8px;
-        margin-left: -16px;
-        height: 96px;
-    }
     body {
-        font-family: Arial, sans-serif;
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f4;
         margin: 0;
         padding: 0;
-        background-color: #f0f0f0;
     }
+
+    #head {
+        background-color: #3498db;
+        color: #fff;
+        text-align: center;
+        padding: 20px 0;
+    }
+
+    h1 {
+        margin: 0;
+    }
+
     .formContainer {
-        background-color: aliceblue;
-        padding-left: 49%;
-        padding-top: 40px;
-        padding-bottom: 41px;
-        margin-left: 25%;
-        margin-right: 49%;
-        margin-top: 6%;
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-    
-    #expense-form label {
+
+    form {
+        text-align: center;
+    }
+
+    label {
         display: block;
-        margin-bottom: 0.5rem;
+        margin: 10px 0;
         font-weight: bold;
-        
     }
-    #expense-form input {
-        width: 97%;
-        padding: 0.5rem;
-        margin-bottom: 1rem;
+
+    input,
+    select {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0 15px;
+        box-sizing: border-box;
         border: 1px solid #ccc;
+        border-radius: 4px;
     }
-    #expense-form {
-        margin-left: -678px;
+
+    #premiumButtn {
+        display: flex;
+        justify-content: space-between;
     }
-    select#category {
-        width: 99%;
-        padding: 0.5rem;
-        margin-bottom: 1rem;
-        border: 1px solid #ccc;
-    }
-    button#buttn {
-        padding: 0.5rem;
-        margin-bottom: 1rem;
-        border: 1px solid #ccc;
-    }
-    button#premiumButton {
-        padding: 0.5rem;
-        margin-bottom: 1rem;
-        border: 1px solid #ccc;
-    }
-    .detailContainer {
-        margin-left: -677px;
-    }
-    button:hover {
-        background-color: #087296;
-        color: hsl(0, 0%, 98%);
+
+    button {
+        background-color: #3498db;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
         cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #2980b9;
+    }
+
+    .detailContainer {
+        margin-top: 20px;
+    }
+
+    h2#form2 {
+        color: #3498db;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 5px;
+    }
+
+    ul#addExpensesDetails {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .flexpage {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    #pagination,
+    .noOfExpenseToShow {
+        margin: 10px 0;
+    }
+
+    select {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    #addExpensesDetails{
+        list-style-type: none;
+        padding: 0;
+        border-bottom: 1px solid #ccc;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 </style>
 <body>
@@ -121,7 +164,8 @@
         async function getPremium(e){
             e.preventDefault();
             const token=localStorage.getItem('token');
-            const response=await axios.get('http://50.19.191.228:5500/pending_prem',{
+            console.log("token is",token);
+            const response=await axios.get('http://localhost:5500/pending_prem',{
                 headers: {
                         'Authorization': `Bearer ${token}`
                 }
@@ -131,7 +175,7 @@
                 "key":response.data.key_id,
                 "order_id":response.data.order.id,
                 "handler":async function (paymentResponse){
-                    await axios.post('http://50.19.191.228:5500/success_trans',{
+                    await axios.post('http://localhost:5500/success_trans',{
                         order_id:options.order_id,
                         payment_id:paymentResponse.razorpay_payment_id,
                     },{
@@ -165,19 +209,19 @@
                 }
             try{
                 const token=localStorage.getItem('token');
-                console.log(token);
-                const response = await axios.post('http://50.19.191.228:5500/expense', data, {
+                const response = await axios.post('http://localhost:5500/expense', data, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                console.log(response);
                 const addExpensesDetails=document.getElementById('addExpensesDetails');
                 const list=document.createElement('li');
+                list.className = "expense-item";
                 const btn=document.createElement('button');
                 btn.addEventListener('click',async()=>{
                     list.remove();
-                    await deleteData(response.data.expenseData.response.signupDatumId);
+                    console.log("id is",response.data.expenseData.newExpense._id);
+                    await deleteData(response.data.expenseData.newExpense._id);
                 })
                 btn.textContent='Delete expense';
                 list.innerHTML=expenseAmount+" - "+Description+" - "+category+" - ";
@@ -200,8 +244,8 @@
                 const itemsPerPageSelect = document.getElementById('selectNoOfExpensesToShow');
                 const itemsPerPage = parseInt(itemsPerPageSelect.value);
                 const token = localStorage.getItem('token');
-                console.log(token);
-                const response = await axios.get(`http://50.19.191.228:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
+                console.log("token is",token);
+                const response = await axios.get(`http://localhost:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
                     headers : {
                         Authorization: `Bearer ${token}`,
                     }
@@ -262,7 +306,8 @@
 
                 btn.addEventListener('click', async () => {
                     list.remove();
-                    await deleteData(expense.id);
+                    console.log("id is ",expense._id);
+                    await deleteData(expense._id);
                 });
 
                 list.innerHTML = `${expense.expense_amount} - ${expense.description} - ${expense.category} - `;
@@ -277,7 +322,7 @@
                 const itemsPerPageSelect = document.getElementById('selectNoOfExpensesToShow');
                 const itemsPerPage = parseInt(itemsPerPageSelect.value);
 
-                const response = await axios.get(`http://50.19.191.228:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
+                const response = await axios.get(`http://localhost:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -302,7 +347,7 @@
         async function deleteData(id) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.delete(`http://50.19.191.228:5500/delete_expense/${id}`, {
+                const response = await axios.delete(`http://localhost:5500/delete_expense/${id}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

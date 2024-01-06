@@ -1,16 +1,22 @@
-const Sequelize=require('sequelize');
-const sequelize=require('../util/database');
-const totalExp=sequelize.define('TotalExpenses',{
-    id:{
-       type:Sequelize.INTEGER,
-       autoIncrement:true,
-       allowNull:false,
-       primaryKey:true
+// totalExpenses model
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const signCred=require('../model/loginDetails');
+const totalExpensesSchema = new Schema({
+    totalExpense: {
+        type: Number,
+        required: true
     },
-    totalExpense:{
-        type:Sequelize.INTEGER,
-        allowNull:false
+    Id:{
+        type:String,
+        required:true
     },
-    
-})
-module.exports=totalExp;
+    user: {
+        type: Object,
+        required: true
+    }
+});
+
+const TotalExpenses = mongoose.model('TotalExpenses', totalExpensesSchema);
+
+module.exports = TotalExpenses;

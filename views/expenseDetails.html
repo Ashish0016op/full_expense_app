@@ -7,63 +7,54 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
             margin: 0;
             padding: 0;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
         }
-        .container {
-            width: 80%;
-            margin-left: 125px;
-            background-color: white;
+    
+        .container, .container2 {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
             padding: 20px;
+            border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
         }
-        .container2 {
-            width: 80%;
-            margin-left: 125px;
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-            margin-top: 31px;
+    
+        h2, h3, h4 {
+            color: #0bb1b7;
+            text-align: center;
         }
-        
+    
+        #date {
+            font-size: 14px;
+            color: #0e00e2;
+            text-align: center;
+        }
+    
         table {
             width: 100%;
-            height: 0;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 15px;
         }
+    
         th, td {
-            border: 1px solid #dddddd;
+            padding: 12px;
             text-align: left;
-            padding: 8px;
+            border-bottom: 1px solid #ddd;
         }
+    
         th {
-            background-color: #f2f2f2;
+            background-color: #0bb1b7;
+            color: #fff;
         }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        #Month {
-            margin-top: 34px;
-        }
-        th {
-            background-color: rgb(15, 180, 221);
-        }
-        .IncomeRow{
-            background-color: rgb(152, 226, 244);
+    
+        tbody tr:hover {
+            background-color: #f5f5f5;
         }
     </style>
+    
 </head>
 <body>
     <div class="container">
@@ -111,7 +102,7 @@
             const page = 1;
             const itemsPerPage = 10;
 
-            axios.get(`http://50.19.191.228:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
+            axios.get(`http://localhost:5500/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -125,6 +116,7 @@
                 let totalExpenses = 0;
                 let totalIncome=0;
                 response.data.getExpense.forEach(expense => {
+                    console.log("expense date is",expense);
                     const YearPrint=document.getElementById('year');
                     const MonthPrint=document.getElementById('Month');
                     const row = document.createElement('tr');
@@ -162,9 +154,9 @@
                 });
                 const expense=response.data.getExpense[0].createdAt;
                 const date = new Date(expense);
-                 const month = monthNames[date.getMonth()]
-                console.log(expense);
-                if(totalIncome!==0){
+                const month = monthNames[date.getMonth()]
+                console.log("year expense is",expense);
+                    console.log("year is called");
                     const row2 = document.createElement('tr');
                     row2.innerHTML=`
                         <td>${month}</td>
@@ -173,7 +165,7 @@
                         <td>${totalIncome-totalExpenses}</td>
                     `
                     expensesBody2.appendChild(row2);
-                }
+                
                 datePrint.innerHTML = new Date().toLocaleString();
             })
             .catch(error => {

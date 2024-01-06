@@ -2,6 +2,7 @@
 const express = require('express');
 const app = express();
 const path = require('path');
+const mongoose=require('mongoose');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -22,15 +23,10 @@ const helmet=require('helmet');
 const compression=require('compression');
 const morgan=require('morgan');
 const fs=require('fs');
-// const accessLogStream=fs.createReadStream(
-//     path.join(__dirname,'access.log'),
-//     {flags:'a'}
-// );
-//app.use(helmet());
 app.use(compression());
-//app.use(morgan('combined',{stream:accessLogStream}))
 app.use(cors());
 app.use(express.json());
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(signRoutes);
 app.use(loginRoutes);
@@ -57,19 +53,19 @@ app.use((req, res, next) => {
     res.sendFile(path.join(__dirname, 'views', 'SignUp.html'));
 });
 
-Login.hasMany(ExpenseData);
-ExpenseData.belongsTo(Login);
+// Login.hasMany(ExpenseData);
+// ExpenseData.belongsTo(Login);
 
-Login.hasMany(premium);
-premium.belongsTo(Login);
+// Login.hasMany(premium);
+// premium.belongsTo(Login);
 
-Login.hasOne(totalExps);
-totalExps.belongsTo(Login);
+// Login.hasOne(totalExps);
+// totalExps.belongsTo(Login);
 
 
-Login.hasMany(forgotPassword);
-forgotPassword.belongsTo(Login);
-sequelize.sync({force:false})
+// Login.hasMany(forgotPassword);
+// forgotPassword.belongsTo(Login);
+mongoose.connect('mongodb://localhost:27017/expense',{ useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => {
     console.log('Data sync successful');
     app.listen(5500, () => {

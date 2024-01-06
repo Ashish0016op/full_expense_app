@@ -1,174 +1,142 @@
+const mongoose=require('mongoose');
 const expenseDetails=require('../model/expenseData');
-const expsAmt=require('../model/totalExpenses');
+const TotalExpenses=require('../model/totalExpenses');
 const config=require('../configuration/config');
 const jwt=require('jsonwebtoken');
 const AWS=require('aws-sdk');
 const { use } = require('../routes/expense');
+const loginDetails = require('../model/loginDetails');
+const fs = require('fs');
+const path = require('path');
+const express = require('express');
+const router = express.Router();
 exports.postDetails=async (req,res,next)=>{
-    try{
-        const expenseAmt=req.body.expense_amount;
-        const des=req.body.description;
-        const cat=req.body.category;
-        const token = req.header('Authorization').replace('Bearer ', '');
-        const decodedToken = jwt.verify(token, config.secretKey);
-        const userId = decodedToken.id;
-        const response=await expenseDetails.create({
-            expense_amount:expenseAmt,
-            description:des,
-            category:cat,
-            signupDatumId:userId,
-            
-        })
-        const totalExpRecord = await expsAmt.findOne({where:{signupDatumId:userId}});
-        let totalExp;
-        if(cat!=='Income'){
-            if (totalExpRecord) {
-                totalExp = totalExpRecord.totalExpense + parseInt(expenseAmt);
-            } else {
-                totalExp = parseInt(expenseAmt);
+    try {
+        const expenseAmt = req.body.expense_amount;
+        const des = req.body.description;
+        const cat = req.body.category;
+        const userId = req.user.id;
+        console.log("hello");
+        const UserDetails=await loginDetails.findById({_id:userId});
+        const newExpense = await expenseDetails.create({
+            expense_amount: expenseAmt,
+            description: des,
+            category: cat,
+            Id:userId,
+            user: UserDetails,
+        });
+        await newExpense.save();
+        if (cat !== 'Income') {
+            let totalExpRecord = await TotalExpenses.findOne({Id:userId});
+            console.log("total expes is",totalExpRecord);
+            if (!totalExpRecord) {
+                totalExpRecord = await TotalExpenses.create({
+                    totalExpense: 0,
+                    user: UserDetails,
+                    Id:userId
+                });
             }
+            totalExpRecord.totalExpense = parseInt(totalExpRecord.totalExpense)+parseInt(expenseAmt);
+            totalExpRecord.user=UserDetails;
+            const totalAmount=await totalExpRecord.save();
+            //console.log("total exp is",totalAmount);
+            const loginDetails1 = await loginDetails.findOne({ _id: userId });
+            loginDetails1.totalExp = totalExpRecord._id;
+            //console.log("loginDetails1 is",loginDetails);
+            await loginDetails1.save();
         }
-        if (totalExpRecord) {
-            await totalExpRecord.update({ totalExpense: totalExp });
-        } else {
-            await expsAmt.create({
-                 totalExpense: totalExp,
-                 signupDatumId:userId,
-            });
-        }
-        res.status(200).json({expenseData:{response}});
-    }catch(error){
-        console.log(error);
+        res.status(200).json({ expenseData: { newExpense } });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
     }
+    
 }
 
 exports.getDetails = async (req, res, next) => {
     try {
-        const token = req.header('Authorization').replace('Bearer ', '');
-        const decodedToken = jwt.verify(token, config.secretKey);
-        const userId = decodedToken.id;
-        console.log(userId);
-        console.log(token);
+        const userId = req.user.id;
         const page = parseInt(req.query.page) || 1;
-        const itemsPerPages = parseInt(req.query.itemsPerPage);
-        console.log("size is",itemsPerPages);
+        const itemsPerPage = parseInt(req.query.itemsPerPage) || 10;
 
-        const offset = (page - 1) * itemsPerPages;
-        
-        const expenses = await expenseDetails.findAll({
-            where: { signupDatumId: userId },
-            limit: itemsPerPages,
-            offset: offset
-        });
-        const count = await expenseDetails.count({
-            where: { signupDatumId: userId }
-        });
+        const offset = (page - 1) * itemsPerPage;
 
+        const expenses = await expenseDetails.find({ 
+            Id:userId       
+        }).limit(itemsPerPage).skip(offset);
+        const count = await expenseDetails.countDocuments({Id:userId});
+        console.log("expense is",expenses.getExpense);
         res.status(200).json({
             getExpense: expenses,
             currentPage: page,
-            itemsPerPage: itemsPerPages,
+            itemsPerPage: itemsPerPage,
             totalItems: count,
-            hasNextPage: itemsPerPages * page < count,
+            hasNextPage: itemsPerPage * page < count,
             nextPage: page + 1,
             hasPreviousPage: page > 1,
             previousPage: page - 1,
-            lastPage: Math.ceil(count / itemsPerPages)
+            lastPage: Math.ceil(count / itemsPerPage)
         });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
-
 }
-
-function uploadToS3(data,filename){
-    const BUCKET_NAME=process.env.BUCKET_NAME;
-    const IAM_USER_KEY=process.env.IAM_USER_KEY;
-    const IAM_USER_SECRET=process.env.IAM_USER_SECRET;
-
-    let s3bucket=new AWS.S3({
-        accessKeyId:IAM_USER_KEY,
-        secretAccessKey:IAM_USER_SECRET,
-        Bucket:BUCKET_NAME
-    })
-    s3bucket.createBucket(()=>{
-        var params={
-            Bucket:BUCKET_NAME,
-            Key:filename,
-            Body:data,
-            ACL:'public-read'
-        }
-        return new Promise((resolve,reject)=>{
-            s3bucket.upload(params,(err,s3response)=>{
-                if(err){
-                    console.log('somthing is wrong',err);
-                    reject(err);
-                }else{
-                    console.log('success',s3response);
-                    resolve(s3response.Location);
-                }
-            })
-        })
-            
-    })
-}
-exports.downloadExpense=async(req,res,next)=>{
-    try{
-        const token = req.header('Authorization').replace('Bearer ', '');
-            const decodedToken = jwt.verify(token, config.secretKey);
-            const userId = decodedToken.id;
-            const getExpense=await expenseDetails.findAll();
-            const stringifyExpense=JSON.stringify(getExpense);
-
-            const filename=`Expense${userId}/${new Date()}.txt`;
-            const fileURL=await uploadToS3(stringifyExpense,filename);
-            res.status(200).json({fileURL,success:true});
-        
-        console.log(getExpense);
-    }catch(err){
-        console.log(err);
-        res.status(500).json({fileURL,success:false});
-    }
-}
-exports.deleteDetails = async (req, res, next) => {
-    const expenseId = req.params.id;
+exports.downloadExpense = async (req, res, next) => {
     try {
-        const token = req.header('Authorization').replace('Bearer ', '');
-        const decodedToken = jwt.verify(token, config.secretKey);
-        const userId = decodedToken.id;
-        console.log(token);
-        console.log(decodedToken);
-        console.log(userId);
-        const transaction = await expenseDetails.sequelize.transaction();
+        const userId = req.user.id;
+        const getExpense = await expenseDetails.find({Id:userId});
+        console.log("expense is ",getExpense);
+        const stringifyExpense = JSON.stringify(getExpense, null, 2);
+        const directory = path.join(__dirname, `Expense${userId}`);
+        if (!fs.existsSync(directory)) {
+            fs.mkdirSync(directory);
+        }
+        const filename = path.join(directory, `${new Date().toISOString().replace(/:/g, '-')}.json`);
+        fs.writeFileSync(filename, stringifyExpense);
+        res.download(filename, 'expenses.json', (err) => {
+            if (err) {
+                console.log(err);
+                res.status(500).json({ success: false });
+            } else {
+                fs.unlinkSync(filename);
+            }
+        });
+        console.log(getExpense);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ success: false });
+    }
+};
 
+    exports.deleteDetails = async (req, res, next) => {
         try {
-            const expenseToDelete = await expenseDetails.findOne({
-                where: { id: expenseId, signupDatumId: userId },
-                transaction
-            });
-
-            if (!expenseToDelete) {
-                throw new Error('Expense not found');
+            console.log(req.params);
+            const expenseId = req.params.expenseId;
+            const userId = req.user.id;
+            console.log("expenseId is",expenseId);
+            console.log("userId is",userId);
+            if (!mongoose.Types.ObjectId.isValid(expenseId)) {
+                return res.status(400).json({ error: 'Invalid expense ID' });
             }
-            await expenseToDelete.destroy({ transaction });
-            const totalExpRecord = await expsAmt.findOne({where:{signupDatumId:userId}});
-            if(expenseToDelete.category!=='Income'){
-                if (totalExpRecord) {
-                    totalExpRecord.totalExpense -= expenseToDelete.expense_amount;
-                    await totalExpRecord.save({ transaction });
-                }
+            const user = await loginDetails.findById(userId);
+            if (!user) {
+                return res.status(401).json({ error: 'Unauthorized: User not found' });
             }
-            await transaction.commit();
+            const deletedExpense = await expenseDetails.findOneAndDelete({_id:expenseId });
+            let totalExpRecord = await TotalExpenses.findOne({ Id: userId });
 
-            res.status(200).json({ message: 'Expense deleted successfully' });
+            if (totalExpRecord) {
+                totalExpRecord.totalExpense -= deletedExpense.expense_amount;
+                await totalExpRecord.save();
+            }
+            
+            if (!deletedExpense) {
+                return res.status(404).json({ error: 'Expense not found or not authorized for deletion' });
+            }    
+            res.status(200).json({ message: 'Expense deleted successfully', deletedExpense });
         } catch (error) {
-            await transaction.rollback();
             console.error(error);
             res.status(500).json({ error: 'An error occurred while deleting the expense' });
         }
-    } catch (error) {
-        console.log(error);
-        res.status(401).json({ error: 'Unauthorized' });
-    }
-};
+    };

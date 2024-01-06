@@ -11,11 +11,12 @@ exports.postDetails=async (req,res,next)=>{
             if(err){
                 console.log('error');
             }
-            const postSignUpData=await signUp.create({
+            const postSignUpData=new signUp({
                 Username:Username,
                 email:email,
                 password:hash
             })
+            await postSignUpData.save();
             res.status(200).json({signUpData:postSignUpData});
         })
     }catch (error){
