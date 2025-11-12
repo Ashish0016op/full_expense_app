@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/full_expense_app/static/css/main.c908a3c8.css",
+    "main.js": "/full_expense_app/static/js/main.0fb6f1c2.js",
+    "index.html": "/full_expense_app/index.html",
+    "main.c908a3c8.css.map": "/full_expense_app/static/css/main.c908a3c8.css.map",
+    "main.0fb6f1c2.js.map": "/full_expense_app/static/js/main.0fb6f1c2.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c908a3c8.css",
+    "static/js/main.0fb6f1c2.js"
+  ]
+}
