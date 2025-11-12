@@ -65,7 +65,7 @@ app.use((req, res, next) => {
 
 // Login.hasMany(forgotPassword);
 // forgotPassword.belongsTo(Login);
-mongoose.connect('mongodb://localhost:27017/expense',{ useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb+srv://gdak0016:Ashish123@cluster0.te3lgnz.mongodb.net/?appName=Cluster0',{ useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => {
     console.log('Data sync successful');
     app.listen(5500, () => {

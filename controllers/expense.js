@@ -85,27 +85,67 @@ exports.getDetails = async (req, res, next) => {
 exports.downloadExpense = async (req, res, next) => {
     try {
         const userId = req.user.id;
-        const getExpense = await expenseDetails.find({Id:userId});
+        const getExpense = await expenseDetails.find({Id:userId}).sort({createdAt: -1});
         console.log("expense is ",getExpense);
-        const stringifyExpense = JSON.stringify(getExpense, null, 2);
+        
+        // Create CSV content with proper headers
+        let csvContent = 'Date,Time,Description,Category,Amount,Type\n';
+        
+        getExpense.forEach(expense => {
+            const dateObj = new Date(expense.createdAt);
+            const date = dateObj.toLocaleDateString('en-IN'); // Format: DD/MM/YYYY
+            const time = dateObj.toLocaleTimeString('en-IN'); // Format: HH:MM:SS AM/PM
+            const description = expense.description.replace(/"/g, '""'); // Escape quotes
+            const category = expense.category;
+            const amount = parseFloat(expense.expense_amount).toFixed(2);
+            const type = category === 'Income' ? 'Income' : 'Expense';
+            
+            csvContent += `"${date}","${time}","${description}","${category}","${amount}","${type}"\n`;
+        });
+        
+        // Add summary at the end
+        let totalIncome = 0;
+        let totalExpense = 0;
+        
+        getExpense.forEach(expense => {
+            if (expense.category === 'Income') {
+                totalIncome += parseFloat(expense.expense_amount);
+            } else {
+                totalExpense += parseFloat(expense.expense_amount);
+            }
+        });
+        
+        csvContent += '\n';
+        csvContent += `"SUMMARY","","","","","">\n`;
+        csvContent += `"","","Total Income","","${totalIncome.toFixed(2)}","Income"\n`;
+        csvContent += `"","","Total Expense","","${totalExpense.toFixed(2)}","Expense"\n`;
+        csvContent += `"","","Net Savings","","${(totalIncome - totalExpense).toFixed(2)}",""\n`;
+        
+        // Create directory if it doesn't exist
         const directory = path.join(__dirname, `Expense${userId}`);
         if (!fs.existsSync(directory)) {
             fs.mkdirSync(directory);
         }
-        const filename = path.join(directory, `${new Date().toISOString().replace(/:/g, '-')}.json`);
-        fs.writeFileSync(filename, stringifyExpense);
-        res.download(filename, 'expenses.json', (err) => {
+        
+        // Create filename with timestamp
+        const filename = path.join(directory, `${new Date().toISOString().replace(/:/g, '-')}.csv`);
+        
+        // Write CSV file
+        fs.writeFileSync(filename, csvContent, 'utf8');
+        
+        // Send file download
+        res.download(filename, `expenses_${new Date().toLocaleDateString('en-IN').replace(/\//g, '-')}.csv`, (err) => {
             if (err) {
                 console.log(err);
-                res.status(500).json({ success: false });
+                res.status(500).json({ success: false, message: 'Error downloading file' });
             } else {
+                // Delete file after download
                 fs.unlinkSync(filename);
             }
         });
-        console.log(getExpense);
     } catch (err) {
         console.log(err);
-        res.status(500).json({ success: false });
+        res.status(500).json({ success: false, message: 'Error generating CSV' });
     }
 };
 
