@@ -1,0 +1,48 @@
+/* Settings Page Styles */
+.settings-page {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 8px 24px rgba(102,126,234,0.10);
+  padding: 32px 28px;
+}
+.settings-page h1 {
+  font-size: 2rem;
+  color: #667eea;
+  margin-bottom: 18px;
+}
+.settings-section {
+  margin-bottom: 32px;
+}
+.settings-section label {
+  font-weight: 600;
+  color: #333;
+  display: block;
+  margin-bottom: 8px;
+}
+.settings-section input,
+.settings-section select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+.settings-actions {
+  text-align: right;
+}
+.settings-actions button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 10px;
+}
+.settings-actions button:hover {
+  opacity: 0.9;
+}
