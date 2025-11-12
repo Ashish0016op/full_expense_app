@@ -62,7 +62,7 @@ const Dashboard = () => {
 
   const fetchAllExpenses = useCallback(async () => {
     try {
-      const response = await axios.get('https://full-expense-app.onrender.com/get_expense?page=1&itemsPerPage=10000', {
+      const response = await axios.get('/get_expense?page=1&itemsPerPage=10000', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

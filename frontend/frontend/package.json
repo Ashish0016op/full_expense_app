@@ -2,7 +2,6 @@
   "name": "expense-tracker-react",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://Ashish0016op.github.io/full_expense_app",
   "proxy": "http://localhost:5500",
   "dependencies": {
     "axios": "^1.6.0",
@@ -17,9 +16,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -37,8 +34,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "gh-pages": "^6.3.0"
   }
 }

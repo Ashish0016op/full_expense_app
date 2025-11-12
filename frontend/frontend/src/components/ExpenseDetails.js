@@ -18,7 +18,7 @@ const ExpenseDetails = () => {
 
     const fetchExpenseDetails = async () => {
       try {
-        const response = await axios.get('https://full-expense-app.onrender.com/get_expense?page=1&itemsPerPage=1000', {
+        const response = await axios.get('/get_expense?page=1&itemsPerPage=1000', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

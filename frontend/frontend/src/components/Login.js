@@ -18,7 +18,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://full-expense-app.onrender.com/login', {
+      const response = await axios.post('/login', {
         email,
         password,
       });

@@ -17,7 +17,7 @@ const Expense = () => {
 
   const fetchExpenses = useCallback(async (page = 1) => {
     try {
-      const response = await axios.get(`https://full-expense-app.onrender.com/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
+      const response = await axios.get(`/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -53,7 +53,7 @@ const Expense = () => {
 
     try {
       await axios.post(
-        'https://full-expense-app.onrender.com/expense',
+        '/expense',
         {
           expense_amount: expenseAmount,
           description,
@@ -79,7 +79,7 @@ const Expense = () => {
 
   const handleDeleteExpense = async (expenseId) => {
     try {
-      await axios.delete(`https://full-expense-app.onrender.com/delete_expense/${expenseId}`, {
+      await axios.delete(`/delete_expense/${expenseId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

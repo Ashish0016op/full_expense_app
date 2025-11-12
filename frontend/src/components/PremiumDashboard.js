@@ -19,7 +19,7 @@ const PremiumDashboard = () => {
 
   const fetchExpenses = useCallback(async (page = 1) => {
     try {
-      const response = await axios.get(`/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
+      const response = await axios.get(`https://full-expense-app.onrender.com/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -55,7 +55,7 @@ const PremiumDashboard = () => {
 
     try {
       await axios.post(
-        '/expense',
+        'https://full-expense-app.onrender.com/expense',
         {
           expense_amount: expenseAmount,
           description,
@@ -81,7 +81,7 @@ const PremiumDashboard = () => {
 
   const handleDeleteExpense = async (expenseId) => {
     try {
-      await axios.delete(`/delete_expense/${expenseId}`, {
+      await axios.delete(`https://full-expense-app.onrender.com/delete_expense/${expenseId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -95,7 +95,7 @@ const PremiumDashboard = () => {
 
   const handleDownloadCSV = async () => {
     try {
-      const response = await axios.get('/download', {
+      const response = await axios.get('https://full-expense-app.onrender.com/download', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -130,7 +130,7 @@ const PremiumDashboard = () => {
     }
 
     try {
-      const response = await axios.get('/AllData', {
+      const response = await axios.get('https://full-expense-app.onrender.com/AllData', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

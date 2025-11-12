@@ -18,7 +18,7 @@ const SignUp = () => {
 
     try {
       // Check if user already exists
-      const userResponse = await axios.get('/user_login');
+      const userResponse = await axios.get('https://full-expense-app.onrender.com/user_login');
       const userExists = userResponse.data.userDetails.some(
         (user) => user.email === email
       );
@@ -30,7 +30,7 @@ const SignUp = () => {
       }
 
       // Create new user
-      await axios.post('/signUp', {
+      await axios.post('https://full-expense-app.onrender.com/signUp', {
         Username: username,
         email,
         password,

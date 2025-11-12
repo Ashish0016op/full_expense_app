@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
 import '../styles/AuthPages.css';
 
-const Login = () => {
+const SignUp = () => {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, setUser } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,37 +17,32 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://full-expense-app.onrender.com/login', {
+      // Check if user already exists
+      const userResponse = await axios.get('/user_login');
+      const userExists = userResponse.data.userDetails.some(
+        (user) => user.email === email
+      );
+
+      if (userExists) {
+        setError('User already exists');
+        setIsLoading(false);
+        return;
+      }
+
+      // Create new user
+      await axios.post('/signUp', {
+        Username: username,
         email,
         password,
       });
 
-      if (response.status === 200 && response.data.message === 'Login successful') {
-        login(response.data.token, response.data.isPremium1);
-        setUser({ email });
-
-        if (response.data.isPremium1) {
-          alert('Login successful as Premium user');
-          navigate('/premium-dashboard');
-        } else {
-          alert('Login successful');
-          navigate('/dashboard');
-        }
-      }
+      alert('Sign up successful! Please log in.');
+      navigate('/login');
     } catch (err) {
-      if (err.response && err.response.status === 401) {
-        setError('Incorrect email or password');
-      } else {
-        setError('An error occurred. Please try again.');
-      }
+      setError(err.response?.data?.message || 'An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleForgotPassword = (e) => {
-    e.preventDefault();
-    navigate('/forgot-password');
   };
 
   const imageStyle = {
@@ -65,7 +59,19 @@ const Login = () => {
             <h2>Expense Tracker</h2>
           </div>
           <div className="auth-content">
-            <h3>Login</h3>
+            <h3>Sign Up</h3>
+            <div className="form-group">
+              <label htmlFor="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                placeholder="Enter Name"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="off"
+                required
+              />
+            </div>
             <div className="form-group">
               <label htmlFor="email">Email address</label>
               <input
@@ -91,23 +97,15 @@ const Login = () => {
               />
             </div>
 
-            <button type="submit" id="login-btn" className="btn btn-primary" disabled={isLoading}>
-              {isLoading ? 'Logging in...' : 'Login'}
-            </button>
-            <button
-              type="button"
-              id="forgot-btn"
-              className="btn btn-secondary"
-              onClick={handleForgotPassword}
-            >
-              Forgot password
+            <button type="submit" className="btn btn-primary" disabled={isLoading}>
+              {isLoading ? 'Signing up...' : 'Sign Up'}
             </button>
 
             {error && <p className="error-message">{error}</p>}
 
             <div className="auth-footer">
               <h5>
-                Don't have an account <Link to="/signup">Sign up</Link>
+                Already have an account <Link to="/login">login</Link>
               </h5>
             </div>
           </div>
@@ -117,4 +115,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;

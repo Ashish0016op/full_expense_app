@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Expense.css';
 
-const Expense = () => {
+const PremiumDashboard = () => {
   const [expenseAmount, setExpenseAmount] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('food');
@@ -12,12 +12,14 @@ const Expense = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [paginationData, setPaginationData] = useState({});
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const { token, isPremium } = useAuth();
   const navigate = useNavigate();
 
   const fetchExpenses = useCallback(async (page = 1) => {
     try {
-      const response = await axios.get(`https://full-expense-app.onrender.com/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
+      const response = await axios.get(`/get_expense?page=${page}&itemsPerPage=${itemsPerPage}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -37,8 +39,8 @@ const Expense = () => {
   }, [itemsPerPage, token]);
 
   useEffect(() => {
-    if (isPremium) {
-      navigate('/premium-dashboard');
+    if (!isPremium) {
+      navigate('/expense');
       return;
     }
     fetchExpenses();
@@ -53,7 +55,7 @@ const Expense = () => {
 
     try {
       await axios.post(
-        'https://full-expense-app.onrender.com/expense',
+        '/expense',
         {
           expense_amount: expenseAmount,
           description,
@@ -79,7 +81,7 @@ const Expense = () => {
 
   const handleDeleteExpense = async (expenseId) => {
     try {
-      await axios.delete(`https://full-expense-app.onrender.com/delete_expense/${expenseId}`, {
+      await axios.delete(`/delete_expense/${expenseId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -91,15 +93,69 @@ const Expense = () => {
     }
   };
 
+  const handleDownloadCSV = async () => {
+    try {
+      const response = await axios.get('/download', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      });
+
+      // Create a blob URL from the response
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      const today = new Date();
+      const dateString = today.toLocaleDateString('en-GB').replace(/\//g, '-');
+      link.setAttribute('download', `expenses_${dateString}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.log(err);
+      alert('Error downloading CSV file');
+    }
+  };
+
+  const handleShowDetails = () => {
+    navigate('/expense-details');
+  };
+
+  const handleShowLeaderboard = async () => {
+    if (showLeaderboard) {
+      setShowLeaderboard(false);
+      return;
+    }
+
+    try {
+      const response = await axios.get('/AllData', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // Sort by totalExpense in descending order
+      const sortedData = response.data.sort(
+        (a, b) => (b.totalExpense || 0) - (a.totalExpense || 0)
+      );
+      setLeaderboard(sortedData);
+      setShowLeaderboard(true);
+    } catch (err) {
+      console.log(err);
+      alert('Error loading leaderboard');
+    }
+  };
+
   return (
     <div className="expense-wrapper">
       <div className="expense-header">
-        <h1>Expense Tracker</h1>
+        <h1>Premium Dashboard</h1>
       </div>
 
       <div className="expense-container">
         <form className="expense-form" onSubmit={handleAddExpense}>
-          <h2>Add Expense</h2>
+          <h2>Premium Expense App</h2>
 
           <div className="form-group">
             <label htmlFor="amount">Enter Expense Amount</label>
@@ -143,6 +199,33 @@ const Expense = () => {
           <button type="submit" className="btn btn-primary">
             Add Expenses
           </button>
+
+          <div className="premium-features">
+            <h3>✨ Premium User Features ✨</h3>
+            <div className="premium-buttons">
+              <button
+                type="button"
+                className="btn btn-premium"
+                onClick={handleShowLeaderboard}
+              >
+                {showLeaderboard ? 'Hide' : 'Show'} Leaderboard
+              </button>
+              <button
+                type="button"
+                className="btn btn-premium"
+                onClick={handleDownloadCSV}
+              >
+                Download CSV
+              </button>
+              <button
+                type="button"
+                className="btn btn-premium"
+                onClick={handleShowDetails}
+              >
+                Details
+              </button>
+            </div>
+          </div>
         </form>
 
         <div className="detail-container">
@@ -207,9 +290,32 @@ const Expense = () => {
             </div>
           </div>
         </div>
+
+        {showLeaderboard && (
+          <div className="leaderboard-container">
+            <h2 className="leaderboard-title">Leaderboard - Top Users by Total Expenses</h2>
+            <ul className="leaderboard-list">
+              {leaderboard.length === 0 ? (
+                <li className="empty-state">No users found</li>
+              ) : (
+                leaderboard.map((userEntry, index) => {
+                  const userName = userEntry.user?.Username || 'Unknown User';
+                  const totalExpense = userEntry.totalExpense || 0;
+                  return (
+                    <li key={userEntry._id} className="user-entry">
+                      <span className="user-rank">#{index + 1}</span>
+                      <span className="user-name">{userName}</span>
+                      <span className="total-expenses">₹{totalExpense}</span>
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default Expense;
+export default PremiumDashboard;
